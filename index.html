@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HD2 — Major Orders Record</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0a0b0c;
+    --surface: #111214;
+    --surface2: #181a1c;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.15);
+    --text: #e8e4d8;
+    --muted: #6b6860;
+    --dim: #3a3830;
+    --accent: #c8a84b;
+    --accent-dim: rgba(200,168,75,0.12);
+    --win: #4a7c4e;
+    --win-text: #8ecf94;
+    --win-bg: rgba(74,124,78,0.15);
+    --loss: #7c3d3d;
+    --loss-text: #d98080;
+    --loss-bg: rgba(124,61,61,0.15);
+    --partial: #6b5a2a;
+    --partial-text: #d4a84b;
+    --partial-bg: rgba(107,90,42,0.15);
+    --bug: #7a4f1e;
+    --bug-text: #e8a056;
+    --bot: #1e4a6b;
+    --bot-text: #56a8e8;
+    --ill: #3d2a6b;
+    --ill-text: #9a7ae0;
+    --multi: #2a3a2a;
+    --multi-text: #7aaa7a;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-cond: 'Barlow Condensed', sans-serif;
+    --font-body: 'Barlow', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* scanline texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 2rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.4;
+  }
+
+  .header-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-family: var(--font-cond);
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .header-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .header-meta {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(140px, 200px));
+    gap: 12px;
+    margin-top: 1.75rem;
+  }
+
+  .meta-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.25rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .meta-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .meta-val {
+    font-family: var(--font-cond);
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+
+  .meta-val.win { color: var(--win-text); }
+  .meta-val.loss { color: var(--loss-text); }
+  .meta-val.rate { color: var(--accent); }
+
+  main {
+    padding: 1.5rem 2rem 3rem;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    align-items: center;
+  }
+
+  .controls-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-right: 4px;
+  }
+
+  .filter-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    border-radius: 8px;
+  }
+
+  .filter-btn:hover { border-color: var(--border-bright); color: var(--text); }
+
+  .filter-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .filter-btn.f-win.active { border-color: var(--win-text); color: var(--win-text); background: var(--win-bg); }
+  .filter-btn.f-loss.active { border-color: var(--loss-text); color: var(--loss-text); background: var(--loss-bg); }
+  .filter-btn.f-bug.active { border-color: var(--bug-text); color: var(--bug-text); background: rgba(122,79,30,0.2); }
+  .filter-btn.f-bot.active { border-color: var(--bot-text); color: var(--bot-text); background: rgba(30,74,107,0.2); }
+  .filter-btn.f-ill.active { border-color: var(--ill-text); color: var(--ill-text); background: rgba(61,42,107,0.2); }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr {
+    border-bottom: 1px solid var(--border-bright);
+  }
+
+  th {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 8px 12px;
+    text-align: left;
+    white-space: nowrap;
+    font-weight: 400;
+  }
+
+  th:first-child { padding-left: 0; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: var(--surface); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td {
+    padding: 10px 12px;
+    vertical-align: top;
+    color: var(--text);
+  }
+
+  td:first-child { padding-left: 0; }
+
+  .td-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+    white-space: nowrap;
+    padding-top: 12px;
+  }
+
+  .td-date {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .td-name {
+    font-family: var(--font-cond);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    max-width: 320px;
+    line-height: 1.3;
+  }
+
+  .td-note {
+    font-size: 12px;
+    color: var(--muted);
+    max-width: 280px;
+    line-height: 1.4;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+
+  .badge-win    { background: var(--win-bg);     color: var(--win-text);     border-color: rgba(78,124,78,0.3); }
+  .badge-loss   { background: var(--loss-bg);    color: var(--loss-text);    border-color: rgba(124,61,61,0.3); }
+  .badge-part   { background: var(--partial-bg); color: var(--partial-text); border-color: rgba(107,90,42,0.3); }
+  .badge-bug    { background: rgba(122,79,30,0.15); color: var(--bug-text);  border-color: rgba(122,79,30,0.3); }
+  .badge-bot    { background: rgba(30,74,107,0.15); color: var(--bot-text);  border-color: rgba(30,74,107,0.3); }
+  .badge-ill    { background: rgba(61,42,107,0.15); color: var(--ill-text);  border-color: rgba(61,42,107,0.3); }
+  .badge-multi  { background: rgba(42,58,42,0.2);   color: var(--multi-text); border-color: rgba(42,58,42,0.4); }
+
+  .divider-year {
+    padding: 16px 0 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-top: 1px solid var(--border);
+  }
+
+  .divider-year td {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 12px 0 6px;
+  }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.06em;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  .hidden { display: none; }
+
+  .result-col { white-space: nowrap; }
+  .enemy-col  { white-space: nowrap; }
+
+  @media (max-width: 640px) {
+    header, main { padding: 1.25rem 1rem; }
+    h1 { font-size: 26px; }
+    .header-meta { grid-template-columns: repeat(2, 1fr); }
+    .meta-val { font-size: 36px; }
+    .td-note { display: none; }
+    footer { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Super Earth High Command — Galactic War Records</div>
+  <h1>Major Orders — <span>Full Record</span></h1>
+  <div class="header-sub">Second Galactic War · Feb 2024 — present · All outcomes logged</div>
+  <div class="header-meta">
+    <div class="meta-item">
+      <span class="meta-label">Total orders</span>
+      <span class="meta-val" id="stat-total">—</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Victories</span>
+      <span class="meta-val win" id="stat-win">—</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Defeats</span>
+      <span class="meta-val loss" id="stat-loss">—</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Win rate</span>
+      <span class="meta-val rate" id="stat-rate">—</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="controls">
+    <span class="controls-label">Filter:</span>
+    <button class="filter-btn active" data-f="all">All</button>
+    <button class="filter-btn f-win" data-f="win">Victories</button>
+    <button class="filter-btn f-loss" data-f="loss">Defeats</button>
+    <button class="filter-btn f-bug" data-f="Terminid">Terminids</button>
+    <button class="filter-btn f-bot" data-f="Automaton">Automatons</button>
+    <button class="filter-btn f-ill" data-f="Illuminate">Illuminate</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date</th>
+          <th>Objective</th>
+          <th>Enemy</th>
+          <th>Result</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<footer>
+  <span>Sources: helldivers.wiki.gg · helldivers.fandom.com · Galactic War Timeline (community) · various news reports</span>
+  <span>Dates are approximate real-world dates · Some early 2024 orders have limited documentation</span>
+</footer>
+
+<script>
+const orders = [
+  { n:1,  year:2024, date:"Feb 2024",     name:"Secure the eastern frontier — liberate Heeth & Angel's Venture",           enemy:"Terminid",  result:"win",     note:"Phase 1 of Operation Valiant Enclosure. TCS barrier planets activated." },
+  { n:2,  year:2024, date:"Feb 2024",     name:"Defend against Automaton incursions into Severin Sector",                   enemy:"Automaton", result:"loss",    note:"Automatons retained key footholds." },
+  { n:3,  year:2024, date:"Mar 16 2024",  name:"Complete Operation Valiant Enclosure — activate the TCS",                   enemy:"Terminid",  result:"win",     note:"TCS activated on Erata Prime, Fenrir III, Meridia & Turing (Barrier Planets)." },
+  { n:4,  year:2024, date:"Mar 2024",     name:"Repel Automaton counterattack — defend Ubanea & Draupnir",                  enemy:"Automaton", result:"loss",    note:"Automatons pushed through, triggering escalation narrative." },
+  { n:5,  year:2024, date:"Mar 2024",     name:"Liberate Tibit to deny Automaton manufacturing",                            enemy:"Automaton", result:"loss",    note:"Automatons retained Tibit and its factories. Bot chatter hinted at counteroffensive." },
+  { n:6,  year:2024, date:"Mar–Apr 2024", name:"Liberate Malevelon Creek",                                                  enemy:"Automaton", result:"win",     note:"Iconic community moment. Liberated within hours. Creek Memorial Day declared Apr 3." },
+  { n:7,  year:2024, date:"Apr 2024",     name:"Liberate Tien Kwan — restore EXO-45 Patriot Exosuit production",           enemy:"Automaton", result:"win",     note:"Exosuit unlocked for all Helldivers upon success." },
+  { n:8,  year:2024, date:"Apr 8–9 2024", name:"Clear E-710 farm construction zones — liberate 3 Terminid planets",        enemy:"Terminid",  result:"win",     note:"Short 1-day order. 35 medals reward." },
+  { n:9,  year:2024, date:"Apr 7 2024",   name:"Operation Swift Disassembly — eradicate the Automaton vanguard",           enemy:"Automaton", result:"win",     note:"Automaton presence wiped from the galactic map." },
+  { n:10, year:2024, date:"Apr–May 2024", name:"Deactivate the Terminid Control System on Barrier Planets",                 enemy:"Terminid",  result:"win",     note:"TCS had caused mutations; players shut it down on Erata Prime, Fenrir III & Turing." },
+  { n:11, year:2024, date:"May 2024",     name:"Destroy 2 billion Automatons",                                              enemy:"Automaton", result:"loss",    note:"Only 78% (~1.56B) reached. 'Second Galactic War' declared. MD-17 Anti-Tank Mines delayed." },
+  { n:12, year:2024, date:"May–Jun 2024", name:"Defend SEAF training facilities (guard new recruits — 72h training)",      enemy:"Automaton", result:"win",     note:"Narrative continuation after Second Galactic War declaration." },
+  { n:13, year:2024, date:"Jun 2024",     name:"Liberate Varylia 5 Petafactory & defend Angel's Venture",                  enemy:"Multi",     result:"win",     note:"Succeeded on both fronts simultaneously." },
+  { n:14, year:2024, date:"Jun–Jul 2024", name:"Kill 2 billion enemies (morale operation)",                                 enemy:"Multi",     result:"loss",    note:"Goal not reached due to declining player count. Citizens reassured by High Command." },
+  { n:15, year:2024, date:"Jul 2024",     name:"Liberate planets to secure EXO-49 Emancipator Exosuit",                    enemy:"Multi",     result:"win",     note:"Dual-autocannon mech unlocked for all Helldivers." },
+  { n:16, year:2024, date:"Aug 2024",     name:"Liberate more planets than the enemy can take (7-day race)",               enemy:"Multi",     result:"win",     note:"Community race vs. both Terminids and Automatons." },
+  { n:17, year:2024, date:"Aug 26–31",    name:"Acquire Orbital Napalm Barrage materials — liberate Vernen Wells + kill 500M bots", enemy:"Automaton", result:"loss", note:"Vernen Wells liberated, but bot kill quota not reached. Napalm Barrage deployment delayed." },
+  { n:18, year:2024, date:"Sep 1–5",      name:"Defend colonies in Jin Xi Sector",                                          enemy:"Automaton", result:"win",     note:"Orbital Napalm Barrage granted for temporary use mid-order (Sep 4)." },
+  { n:19, year:2024, date:"Sep 13–16",    name:"Reduce Terminid population — kill Warriors & Bile Spewers",                enemy:"Terminid",  result:"win",     note:"Kill quota met. Side objectives on Mastia & Tarsh also pursued." },
+  { n:20, year:2024, date:"Sep 17–24",    name:"Liberate more planets than the enemy (second race)",                        enemy:"Multi",     result:"win",     note:"7-day community challenge vs. both factions." },
+  { n:21, year:2024, date:"Dec 2024",     name:"Respond to Illuminate emergence — defend against first squid incursions",  enemy:"Illuminate",result:"loss",    note:"Illuminate introduced Dec 12. DSS tested defensively; order ultimately failed." },
+  { n:22, year:2025, date:"Jan 2025",     name:"Defend 14 planets from Illuminate invasions",                               enemy:"Illuminate",result:"loss",    note:"Only ~50% of playerbase engaged. 14 defense objectives vs. prior 5. Described as 'tedious grind'." },
+  { n:23, year:2025, date:"Feb–Mar 2025", name:"Kill 2.5 billion Illuminate — slow the Great Host advance",                enemy:"Illuminate",result:"win",     note:"Quota met. Directly led into next order." },
+  { n:24, year:2025, date:"Mar 2025",     name:"Extract 20 million times against Illuminate invaders",                      enemy:"Illuminate",result:"loss",    note:"Extraction quota not reached." },
+  { n:25, year:2025, date:"Mar–May 2025", name:"Hold Super Earth — defend Prosperity City from Illuminate assault",        enemy:"Illuminate",result:"win",     note:"Illuminate forces retreated May 30. Pivotal story milestone." },
+  { n:26, year:2025, date:"Aug 2025",     name:"Kill quotas across all three factions (triple-front order)",               enemy:"Multi",     result:"partial", note:"Illuminate quota completed; Bore Rock and Tyranny Park construction site fell. Mixed outcome." },
+  { n:27, year:2025, date:"Sep 9–16",     name:"Defend 7 Gloom-adjacent planets from Terminid swarm attacks",             enemy:"Terminid",  result:"partial", note:"Followed Oshaune failure. Crimsica defended; Acamar IV and others contested." },
+  { n:28, year:2025, date:"Sep 2025",     name:"Collect 250M Common & 200M Rare Samples on Oshaune (first Hive World MO)",enemy:"Terminid",  result:"loss",    note:"'Into the Unjust' update. Community failed in underground cave biomes. Historically bad result." },
+  { n:29, year:2025, date:"Oct 2025",     name:"Liberate Erata Prime & Estanu while holding Hellmire",                     enemy:"Terminid",  result:"win",     note:"Liberating Estanu stopped Hellmire attacks. Required coordinated final push." },
+  { n:30, year:2025, date:"Nov–Dec 2025", name:"Stop Illuminate attacks to slow Meridia's trajectory",                     enemy:"Illuminate",result:"win",     note:"Multiple Illuminate invasions stopped. Meridia singularity path altered." },
+  { n:31, year:2026, date:"Feb 13 2026",  name:"Active order disrupted by exploit attempt — galactic war briefly disabled", enemy:"Multi",    result:"win",     note:"Players attempted to auto-complete via exploit. War paused & counters adjusted. Order completed." },
+];
+
+const RESULT_BADGE = {
+  win:     '<span class="badge badge-win">Victory</span>',
+  loss:    '<span class="badge badge-loss">Defeat</span>',
+  partial: '<span class="badge badge-part">Partial</span>',
+};
+const ENEMY_BADGE = {
+  Terminid:  '<span class="badge badge-bug">Terminids</span>',
+  Automaton: '<span class="badge badge-bot">Automatons</span>',
+  Illuminate:'<span class="badge badge-ill">Illuminate</span>',
+  Multi:     '<span class="badge badge-multi">Multi-front</span>',
+};
+
+let currentFilter = "all";
+
+function renderTable(filter) {
+  const tbody = document.getElementById("tbody");
+  let rows = orders;
+  if (filter === "win")       rows = orders.filter(o => o.result === "win");
+  else if (filter === "loss") rows = orders.filter(o => o.result !== "win");
+  else if (["Terminid","Automaton","Illuminate"].includes(filter)) rows = orders.filter(o => o.enemy === filter);
+
+  let lastYear = null;
+  const html = rows.map(o => {
+    let divider = "";
+    if (o.year !== lastYear) {
+      lastYear = o.year;
+      const label = o.year === 2024 ? "Year 2184 — 2024" : o.year === 2025 ? "Year 2185 — 2025" : "Year 2186 — 2026";
+      divider = `<tr class="divider-year"><td colspan="6" style="padding: 16px 0 6px; font-family:'Share Tech Mono',monospace; font-size:10px; color:#c8a84b; letter-spacing:0.2em; text-transform:uppercase; border-top: 1px solid rgba(255,255,255,0.07);">${label}</td></tr>`;
+    }
+    return divider + `<tr data-result="${o.result}" data-enemy="${o.enemy}">
+      <td class="td-num">${String(o.n).padStart(2,"0")}</td>
+      <td class="td-date">${o.date}</td>
+      <td class="td-name">${o.name}</td>
+      <td class="enemy-col">${ENEMY_BADGE[o.enemy]}</td>
+      <td class="result-col">${RESULT_BADGE[o.result]}</td>
+      <td class="td-note">${o.note}</td>
+    </tr>`;
+  }).join("");
+
+  tbody.innerHTML = html;
+
+  const wins   = rows.filter(o => o.result === "win").length;
+  const losses = rows.filter(o => o.result !== "win").length;
+  const total  = rows.length;
+  document.getElementById("stat-total").textContent = total;
+  document.getElementById("stat-win").textContent   = wins;
+  document.getElementById("stat-loss").textContent  = losses;
+  document.getElementById("stat-rate").textContent  = total ? Math.round(wins / total * 100) + "%" : "—";
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderTable(btn.dataset.f);
+  });
+});
+
+renderTable("all");
+</script>
+</body>
+</html>
