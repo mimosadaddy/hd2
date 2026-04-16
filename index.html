@@ -3,7 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HD2 — Major Orders Record</title>
+<title>HD2 — Major Orders Record | Papiplayero37</title>
+
+<!-- Primary meta -->
+<meta name="description" content="Complete record of all Helldivers 2 Major Orders from launch to present. 31 orders logged with outcomes, factions, and lore context.">
+<meta name="author" content="Papiplayero37">
+
+<!-- Open Graph (Facebook, Discord, most platforms) -->
+<meta property="og:type"        content="website">
+<meta property="og:url"         content="https://mimosadaddy.github.io/hd2/">
+<meta property="og:title"       content="HD2 Major Orders — Full Record">
+<meta property="og:description" content="Complete record of all Helldivers 2 Major Orders from launch to present. 31 orders logged with outcomes, factions, and lore context. Compiled by Papiplayero37.">
+<meta property="og:image"       content="https://mimosadaddy.github.io/hd2/preview.png">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="628">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:site"        content="@dxnilosierra">
+<meta name="twitter:creator"     content="@dxnilosierra">
+<meta name="twitter:title"       content="HD2 Major Orders — Full Record">
+<meta name="twitter:description" content="Complete record of all Helldivers 2 Major Orders from launch to present. 31 orders logged with outcomes, factions, and lore context.">
+<meta name="twitter:image"       content="https://mimosadaddy.github.io/hd2/preview.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500&display=swap');
 
@@ -123,7 +144,21 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    transition: border-color 0.15s, background 0.15s;
   }
+
+  .meta-item.filterable {
+    cursor: pointer;
+  }
+
+  .meta-item.filterable:hover {
+    border-color: var(--border-bright);
+    background: var(--surface2);
+  }
+
+  .meta-item.filterable.active          { border-color: var(--accent);    background: var(--accent-dim); }
+  .meta-item.filterable.active-win      { border-color: var(--win-text);  background: var(--win-bg); }
+  .meta-item.filterable.active-loss     { border-color: var(--loss-text); background: var(--loss-bg); }
 
   .meta-label {
     font-family: var(--font-mono);
@@ -489,15 +524,15 @@
   <div class="header-sub">Second Galactic War · Feb 2024 — present · All outcomes logged</div>
   <div class="header-credit">Compiled by // <span>Papiplayero37</span></div>
   <div class="header-meta">
-    <div class="meta-item">
+    <div class="meta-item filterable active" data-f="all">
       <span class="meta-label">Total orders</span>
       <span class="meta-val" id="stat-total">—</span>
     </div>
-    <div class="meta-item">
+    <div class="meta-item filterable" data-f="win">
       <span class="meta-label">Victories</span>
       <span class="meta-val win" id="stat-win">—</span>
     </div>
-    <div class="meta-item">
+    <div class="meta-item filterable" data-f="loss">
       <span class="meta-label">Defeats</span>
       <span class="meta-val loss" id="stat-loss">—</span>
     </div>
@@ -510,10 +545,7 @@
 
 <main>
   <div class="controls">
-    <span class="controls-label">Filter:</span>
-    <button class="filter-btn active" data-f="all">All</button>
-    <button class="filter-btn f-win" data-f="win">Victories</button>
-    <button class="filter-btn f-loss" data-f="loss">Defeats</button>
+    <span class="controls-label">Faction:</span>
     <button class="filter-btn f-bug" data-f="Terminid">Terminids</button>
     <button class="filter-btn f-bot" data-f="Automaton">Automatons</button>
     <button class="filter-btn f-ill" data-f="Illuminate">Illuminate</button>
@@ -551,13 +583,13 @@
 const orders = [
   { n:1,  year:2024, date:"Feb 2024",     name:"Secure the eastern frontier — liberate Heeth & Angel's Venture",           enemy:"Terminid",  result:"win",     note:"Phase 1 of Operation Valiant Enclosure. TCS barrier planets activated.",                                                                           src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
   { n:2,  year:2024, date:"Feb 2024",     name:"Defend against Automaton incursions into Severin Sector",                   enemy:"Automaton", result:"loss",    note:"Automatons retained key footholds.",                                                                                                               src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
-  { n:3,  year:2024, date:"Mar 16 2024",  name:"Complete Operation Valiant Enclosure — activate the TCS",                   enemy:"Terminid",  result:"win",     note:"TCS activated on Erata Prime, Fenrir III, Meridia & Turing (Barrier Planets).",                                                                  src:"https://helldivers.wiki.gg/wiki/Terminid_Control_System" },
+  { n:3,  year:2024, date:"Mar 16, 2024", name:"Complete Operation Valiant Enclosure — activate the TCS",                   enemy:"Terminid",  result:"win",     note:"TCS activated on Erata Prime, Fenrir III, Meridia & Turing (Barrier Planets).",                                                                  src:"https://helldivers.wiki.gg/wiki/Terminid_Control_System" },
   { n:4,  year:2024, date:"Mar 2024",     name:"Repel Automaton counterattack — defend Ubanea & Draupnir",                  enemy:"Automaton", result:"loss",    note:"Automatons pushed through, triggering escalation narrative.",                                                                                      src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
   { n:5,  year:2024, date:"Mar 2024",     name:"Liberate Tibit to deny Automaton manufacturing",                            enemy:"Automaton", result:"loss",    note:"Automatons retained Tibit and its factories. Bot chatter hinted at counteroffensive.",                                                             src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
   { n:6,  year:2024, date:"Mar–Apr 2024", name:"Liberate Malevelon Creek",                                                  enemy:"Automaton", result:"win",     note:"Iconic community moment. Liberated within hours. Creek Memorial Day declared Apr 3.",                                                              src:"https://helldivers.wiki.gg/wiki/Malevelon_Creek" },
   { n:7,  year:2024, date:"Apr 2024",     name:"Liberate Tien Kwan — restore EXO-45 Patriot Exosuit production",           enemy:"Automaton", result:"win",     note:"Exosuit unlocked for all Helldivers upon success.",                                                                                                src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
-  { n:8,  year:2024, date:"Apr 8–9 2024", name:"Clear E-710 farm construction zones — liberate 3 Terminid planets",        enemy:"Terminid",  result:"win",     note:"Short 1-day order. 35 medals reward.",                                                                                                            src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
-  { n:9,  year:2024, date:"Apr 7 2024",   name:"Operation Swift Disassembly — eradicate the Automaton vanguard",           enemy:"Automaton", result:"win",     note:"Automaton presence wiped from the galactic map.",                                                                                                  src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
+  { n:8,  year:2024, date:"Apr 8–9, 2024", name:"Clear E-710 farm construction zones — liberate 3 Terminid planets",        enemy:"Terminid",  result:"win",     note:"Short 1-day order. 35 medals reward.",                                                                                                            src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
+  { n:9,  year:2024, date:"Apr 7, 2024",  name:"Operation Swift Disassembly — eradicate the Automaton vanguard",           enemy:"Automaton", result:"win",     note:"Automaton presence wiped from the galactic map.",                                                                                                  src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
   { n:10, year:2024, date:"Apr–May 2024", name:"Deactivate the Terminid Control System on Barrier Planets",                 enemy:"Terminid",  result:"win",     note:"TCS had caused mutations; players shut it down on Erata Prime, Fenrir III & Turing.",                                                            src:"https://helldivers.wiki.gg/wiki/Terminid_Control_System" },
   { n:11, year:2024, date:"May 2024",     name:"Destroy 2 billion Automatons",                                              enemy:"Automaton", result:"loss",    note:"Only 78% (~1.56B) reached. 'Second Galactic War' declared. MD-17 Anti-Tank Mines delayed.",                                                      src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
   { n:12, year:2024, date:"May–Jun 2024", name:"Defend SEAF training facilities (guard new recruits — 72h training)",      enemy:"Automaton", result:"win",     note:"Narrative continuation after Second Galactic War declaration.",                                                                                    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
@@ -565,21 +597,21 @@ const orders = [
   { n:14, year:2024, date:"Jun–Jul 2024", name:"Kill 2 billion enemies (morale operation)",                                 enemy:"Multi",     result:"loss",    note:"Goal not reached due to declining player count. Citizens reassured by High Command.",                                                              src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
   { n:15, year:2024, date:"Jul 2024",     name:"Liberate planets to secure EXO-49 Emancipator Exosuit",                    enemy:"Multi",     result:"win",     note:"Dual-autocannon mech unlocked for all Helldivers.",                                                                                                src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
   { n:16, year:2024, date:"Aug 2024",     name:"Liberate more planets than the enemy can take (7-day race)",               enemy:"Multi",     result:"win",     note:"Community race vs. both Terminids and Automatons.",                                                                                                 src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
-  { n:17, year:2024, date:"Aug 26–31",    name:"Acquire Orbital Napalm Barrage materials — liberate Vernen Wells + kill 500M bots", enemy:"Automaton", result:"loss", note:"Vernen Wells liberated, but bot kill quota not reached. Napalm Barrage deployment delayed.",                                               src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
-  { n:18, year:2024, date:"Sep 1–5",      name:"Defend colonies in Jin Xi Sector",                                          enemy:"Automaton", result:"win",     note:"Orbital Napalm Barrage granted for temporary use mid-order (Sep 4).",                                                                              src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
-  { n:19, year:2024, date:"Sep 13–16",    name:"Reduce Terminid population — kill Warriors & Bile Spewers",                enemy:"Terminid",  result:"win",     note:"Kill quota met. Side objectives on Mastia & Tarsh also pursued.",                                                                                  src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
-  { n:20, year:2024, date:"Sep 17–24",    name:"Liberate more planets than the enemy (second race)",                        enemy:"Multi",     result:"win",     note:"7-day community challenge vs. both factions.",                                                                                                      src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
+  { n:17, year:2024, date:"Aug 26–31, 2024", name:"Acquire Orbital Napalm Barrage materials — liberate Vernen Wells + kill 500M bots", enemy:"Automaton", result:"loss", note:"Vernen Wells liberated, but bot kill quota not reached. Napalm Barrage deployment delayed.",                                               src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
+  { n:18, year:2024, date:"Sep 1–5, 2024", name:"Defend colonies in Jin Xi Sector",                                          enemy:"Automaton", result:"win",     note:"Orbital Napalm Barrage granted for temporary use mid-order (Sep 4).",                                                                              src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
+  { n:19, year:2024, date:"Sep 13–16, 2024", name:"Reduce Terminid population — kill Warriors & Bile Spewers",                enemy:"Terminid",  result:"win",     note:"Kill quota met. Side objectives on Mastia & Tarsh also pursued.",                                                                                  src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
+  { n:20, year:2024, date:"Sep 17–24, 2024", name:"Liberate more planets than the enemy (second race)",                        enemy:"Multi",     result:"win",     note:"7-day community challenge vs. both factions.",                                                                                                      src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
   { n:21, year:2024, date:"Dec 2024",     name:"Respond to Illuminate emergence — defend against first squid incursions",  enemy:"Illuminate",result:"loss",    note:"Illuminate introduced Dec 12. DSS tested defensively; order ultimately failed.",                                                                   src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" },
   { n:22, year:2025, date:"Jan 2025",     name:"Defend 14 planets from Illuminate invasions",                               enemy:"Illuminate",result:"loss",    note:"Only ~50% of playerbase engaged. 14 defense objectives vs. prior 5. Described as 'tedious grind'.",                                             src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
   { n:23, year:2025, date:"Feb–Mar 2025", name:"Kill 2.5 billion Illuminate — slow the Great Host advance",                enemy:"Illuminate",result:"win",     note:"Quota met. Directly led into next order.",                                                                                                          src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
   { n:24, year:2025, date:"Mar 2025",     name:"Extract 20 million times against Illuminate invaders",                      enemy:"Illuminate",result:"loss",    note:"Extraction quota not reached.",                                                                                                                    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
   { n:25, year:2025, date:"Mar–May 2025", name:"Hold Super Earth — defend Prosperity City from Illuminate assault",        enemy:"Illuminate",result:"win",     note:"Illuminate forces retreated May 30. Pivotal story milestone.",                                                                                     src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
   { n:26, year:2025, date:"Aug 2025",     name:"Kill quotas across all three factions (triple-front order)",               enemy:"Multi",     result:"partial", note:"Illuminate quota completed; Bore Rock and Tyranny Park construction site fell. Mixed outcome.",                                                    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
-  { n:27, year:2025, date:"Sep 9–16",     name:"Defend 7 Gloom-adjacent planets from Terminid swarm attacks",             enemy:"Terminid",  result:"partial", note:"Followed Oshaune failure. Crimsica defended; Acamar IV and others contested.",                                                                    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
+  { n:27, year:2025, date:"Sep 9–16, 2025", name:"Defend 7 Gloom-adjacent planets from Terminid swarm attacks",             enemy:"Terminid",  result:"partial", note:"Followed Oshaune failure. Crimsica defended; Acamar IV and others contested.",                                                                    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
   { n:28, year:2025, date:"Sep 2025",     name:"Collect 250M Common & 200M Rare Samples on Oshaune (first Hive World MO)",enemy:"Terminid",  result:"loss",    note:"'Into the Unjust' update. Community failed in underground cave biomes. Historically bad result.",                                                 src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
   { n:29, year:2025, date:"Oct 2025",     name:"Liberate Erata Prime & Estanu while holding Hellmire",                     enemy:"Terminid",  result:"win",     note:"Liberating Estanu stopped Hellmire attacks. Required coordinated final push.",                                                                    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
   { n:30, year:2025, date:"Nov–Dec 2025", name:"Stop Illuminate attacks to slow Meridia's trajectory",                     enemy:"Illuminate",result:"win",     note:"Multiple Illuminate invasions stopped. Meridia singularity path altered.",                                                                         src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" },
-  { n:31, year:2026, date:"Feb 13 2026",  name:"Active order disrupted by exploit attempt — galactic war briefly disabled", enemy:"Multi",    result:"win",     note:"Players attempted to auto-complete via exploit. War paused & counters adjusted. Order completed.",                                                src:"https://helldivers.wiki.gg/wiki/Major_Orders" },
+  { n:31, year:2026, date:"Feb 13, 2026", name:"Active order disrupted by exploit attempt — galactic war briefly disabled", enemy:"Multi",    result:"win",     note:"Players attempted to auto-complete via exploit. War paused & counters adjusted. Order completed.",                                                src:"https://helldivers.wiki.gg/wiki/Major_Orders" },
 ];
 
 const RESULT_BADGE = {
@@ -632,11 +664,36 @@ function renderTable(filter) {
   document.getElementById("stat-rate").textContent  = total ? Math.round(wins / total * 100) + "%" : "—";
 }
 
+function setFilter(f) {
+  // Update stat cards
+  document.querySelectorAll(".meta-item.filterable").forEach(card => {
+    card.classList.remove("active", "active-win", "active-loss");
+    if (card.dataset.f === f) {
+      if (f === "win")  card.classList.add("active-win");
+      else if (f === "loss") card.classList.add("active-loss");
+      else card.classList.add("active");
+    }
+  });
+  // Update faction buttons
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  const factionBtn = document.querySelector(`.filter-btn[data-f="${f}"]`);
+  if (factionBtn) factionBtn.classList.add("active");
+
+  renderTable(f);
+}
+
+document.querySelectorAll(".meta-item.filterable").forEach(card => {
+  card.addEventListener("click", () => setFilter(card.dataset.f));
+});
+
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    renderTable(btn.dataset.f);
+    // Toggle off if already active, go back to "all"
+    if (btn.classList.contains("active")) {
+      setFilter("all");
+    } else {
+      setFilter(btn.dataset.f);
+    }
   });
 });
 
