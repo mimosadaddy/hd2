@@ -705,6 +705,7 @@
     <button class="filter-btn f-bot" data-f="Automaton">Automatons</button>
     <button class="filter-btn f-ill" data-f="Illuminate">Illuminate</button>
     <button class="filter-btn clear-btn hidden" id="clear-filter">× Clear</button>
+    <button class="filter-btn sort-btn" id="sort-toggle" style="margin-left:auto">Oldest first ↑</button>
   </div>
 
   <div class="table-wrap">
@@ -783,6 +784,14 @@ const ENEMY_BADGE = {
 };
 
 let currentFilter = "all";
+let sortNewest = localStorage.getItem('hd2-sort') === 'newest';
+
+function updateSortBtn() {
+  const btn = document.getElementById('sort-toggle');
+  btn.textContent = sortNewest ? 'Newest first ↓' : 'Oldest first ↑';
+  btn.style.borderColor = sortNewest ? 'var(--accent)' : '';
+  btn.style.color       = sortNewest ? 'var(--accent)' : '';
+}
 
 function renderTable(filter) {
   const tbody = document.getElementById("tbody");
@@ -790,6 +799,7 @@ function renderTable(filter) {
   if (filter === "win")       rows = orders.filter(o => o.result === "win");
   else if (filter === "loss") rows = orders.filter(o => o.result !== "win");
   else if (["Terminid","Automaton","Illuminate"].includes(filter)) rows = orders.filter(o => o.enemy === filter);
+  if (sortNewest) rows = [...rows].reverse();
 
   let lastYear = null;
   const html = rows.map(o => {
@@ -865,6 +875,15 @@ document.querySelectorAll(".filter-btn:not(.clear-btn)").forEach(btn => {
 
 // Clear button
 document.getElementById("clear-filter").addEventListener("click", () => setFilter("all"));
+
+// Sort toggle
+updateSortBtn();
+document.getElementById("sort-toggle").addEventListener("click", () => {
+  sortNewest = !sortNewest;
+  localStorage.setItem('hd2-sort', sortNewest ? 'newest' : 'oldest');
+  updateSortBtn();
+  renderTable(currentFilter);
+});
 
 renderTable("all");
 
