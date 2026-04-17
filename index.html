@@ -225,6 +225,22 @@
 
   .filter-btn.f-win.active { border-color: var(--win-text); color: var(--win-text); background: var(--win-bg); }
   .filter-btn.f-loss.active { border-color: var(--loss-text); color: var(--loss-text); background: var(--loss-bg); }
+
+  .clear-btn {
+    border-color: var(--border);
+    color: var(--muted);
+    margin-left: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.15s, opacity 0.2s;
+  }
+
+  .clear-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .clear-btn:hover { border-color: var(--loss-text) !important; color: var(--loss-text) !important; }
   .filter-btn.f-bug.active { border-color: var(--bug-text); color: var(--bug-text); background: rgba(122,79,30,0.2); }
   .filter-btn.f-bot.active { border-color: var(--bot-text); color: var(--bot-text); background: rgba(107,32,32,0.2); }
   .filter-btn.f-ill.active { border-color: var(--ill-text); color: var(--ill-text); background: rgba(61,42,107,0.2); }
@@ -481,6 +497,142 @@
     color: var(--muted);
   }
 
+  /* ── Current Active Order ── */
+  .current-order {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .current-order::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(200,168,75,0.06), transparent 60%);
+    pointer-events: none;
+  }
+
+  .co-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .co-live {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--win-text);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .co-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--win-text);
+    animation: co-pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes co-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.25; }
+  }
+
+  .co-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .co-expires {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-left: auto;
+  }
+
+  .co-briefing {
+    font-family: var(--font-cond);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+  }
+
+  .co-footer {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .co-reward {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+
+  .co-text {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-top: 0.25rem;
+  }
+
+  .co-text p { margin-bottom: 0.4rem; }
+  .co-text p:last-child { margin-bottom: 0; }
+
+  .dispatch-title {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .dispatch-hi {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .co-source {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.12s;
+  }
+
+  .co-source:hover { color: var(--accent); }
+
+  .co-error {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.06em;
+    padding: 0.5rem 0;
+  }
+
   .hidden { display: none; }
 
   .result-col { white-space: nowrap; }
@@ -512,6 +664,7 @@
       <a href="https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" target="_blank" rel="noopener">helldivers.wiki.gg — Major Orders of 2024</a>
       <a href="https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" target="_blank" rel="noopener">helldivers.wiki.gg — Major Orders of 2025</a>
       <a href="https://helldivers.fandom.com/wiki/Major_Orders" target="_blank" rel="noopener">helldivers.fandom.com — Major Orders</a>
+      <a href="https://helldiverscompanion.com/#news" target="_blank" rel="noopener">helldiverscompanion.com — Dispatch Log</a>
       <a href="https://docs.google.com/document/d/1lvlNVU5aNPcUtPpxAsFS93P2xOJTAt-4HfKQH-IxRaA/edit?tab=t.0" target="_blank" rel="noopener">Community Galactic War Timeline (Herald/Cobfish)</a>
       <div class="source-note">Early Feb–Mar 2024 orders have limited documentation. Dates are approximate real-world dates, not in-universe dates.</div>
     </div>
@@ -544,11 +697,14 @@
 </header>
 
 <main>
+  <div id="current-order-wrap"></div>
+
   <div class="controls">
     <span class="controls-label">Faction:</span>
     <button class="filter-btn f-bug" data-f="Terminid">Terminids</button>
     <button class="filter-btn f-bot" data-f="Automaton">Automatons</button>
     <button class="filter-btn f-ill" data-f="Illuminate">Illuminate</button>
+    <button class="filter-btn clear-btn hidden" id="clear-filter">× Clear</button>
   </div>
 
   <div class="table-wrap">
@@ -665,37 +821,50 @@ function renderTable(filter) {
 }
 
 function setFilter(f) {
+  currentFilter = f;
+
   // Update stat cards
   document.querySelectorAll(".meta-item.filterable").forEach(card => {
     card.classList.remove("active", "active-win", "active-loss");
     if (card.dataset.f === f) {
-      if (f === "win")  card.classList.add("active-win");
+      if (f === "win")       card.classList.add("active-win");
       else if (f === "loss") card.classList.add("active-loss");
-      else card.classList.add("active");
+      else                   card.classList.add("active");
     }
   });
+
   // Update faction buttons
-  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".filter-btn:not(.clear-btn)").forEach(b => b.classList.remove("active"));
   const factionBtn = document.querySelector(`.filter-btn[data-f="${f}"]`);
   if (factionBtn) factionBtn.classList.add("active");
+
+  // Show/hide clear button
+  const clearBtn = document.getElementById("clear-filter");
+  if (f === "all") {
+    clearBtn.classList.remove("visible");
+  } else {
+    clearBtn.classList.add("visible");
+  }
 
   renderTable(f);
 }
 
+// Stat cards: toggle off if already active
 document.querySelectorAll(".meta-item.filterable").forEach(card => {
-  card.addEventListener("click", () => setFilter(card.dataset.f));
-});
-
-document.querySelectorAll(".filter-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    // Toggle off if already active, go back to "all"
-    if (btn.classList.contains("active")) {
-      setFilter("all");
-    } else {
-      setFilter(btn.dataset.f);
-    }
+  card.addEventListener("click", () => {
+    setFilter(card.dataset.f === currentFilter ? "all" : card.dataset.f);
   });
 });
+
+// Faction buttons: toggle off if already active
+document.querySelectorAll(".filter-btn:not(.clear-btn)").forEach(btn => {
+  btn.addEventListener("click", () => {
+    setFilter(btn.dataset.f === currentFilter ? "all" : btn.dataset.f);
+  });
+});
+
+// Clear button
+document.getElementById("clear-filter").addEventListener("click", () => setFilter("all"));
 
 renderTable("all");
 
@@ -713,6 +882,75 @@ document.getElementById('font-increase').addEventListener('click', () => {
   if (zoom < 1.4) { zoom = Math.round((zoom + 0.1) * 10) / 10; localStorage.setItem('hd2-zoom', zoom); applyZoom(); }
 });
 applyZoom();
+
+// ── Current Active Order ──
+function timeRemaining(isoDate) {
+  const diff = new Date(isoDate) - Date.now();
+  if (diff <= 0) return "Expired";
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  return d > 0 ? `${d}d ${h}h remaining` : `${h}h ${m}m remaining`;
+}
+
+function parseDispatch(msg) {
+  return msg
+    .replace(/<i=3>(.*?)<\/i>/g, '<span class="dispatch-title">$1</span>')
+    .replace(/<i=1>(.*?)<\/i>/g, '<span class="dispatch-hi">$1</span>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+}
+
+async function loadCurrentOrder() {
+  const wrap = document.getElementById('current-order-wrap');
+  try {
+    const headers = {
+      'X-Super-Client': 'hd2-major-orders-dashboard',
+      'X-Super-Contact': 'dxnilosierra'
+    };
+    const [assignRes, dispatchRes] = await Promise.all([
+      fetch('https://api.helldivers2.dev/api/v1/assignments', { headers }),
+      fetch('https://api.helldivers2.dev/api/v1/dispatches',  { headers })
+    ]);
+    if (!assignRes.ok) throw new Error();
+
+    const [assignments, dispatches] = await Promise.all([
+      assignRes.json(),
+      dispatchRes.ok ? dispatchRes.json() : Promise.resolve([])
+    ]);
+
+    if (!assignments || !assignments.length) return;
+
+    const order    = assignments[0];
+    const medals   = order.reward?.amount ?? order.rewards?.[0]?.amount ?? null;
+    const dispatch = dispatches?.[0];
+    const text     = dispatch?.message ? parseDispatch(dispatch.message) : order.briefing;
+
+    wrap.innerHTML = `
+      <div class="current-order">
+        <div class="co-header">
+          <span class="co-live"><span class="co-dot"></span>Live</span>
+          <span class="co-label">Active Major Order</span>
+          <span class="co-expires" id="co-expires">${timeRemaining(order.expiration)}</span>
+        </div>
+        <div class="co-text"><p>${text}</p></div>
+        <div class="co-footer">
+          ${medals !== null ? `<span class="co-reward">⬡ ${medals} Medals</span>` : ''}
+          <a class="co-source" href="https://helldiverscompanion.com/#news" target="_blank" rel="noopener">Full dispatch log on Helldivers Companion ↗</a>
+        </div>
+      </div>`;
+
+    setInterval(() => {
+      const el = document.getElementById('co-expires');
+      if (el) el.textContent = timeRemaining(order.expiration);
+    }, 60000);
+
+  } catch (e) {
+    // Fail silently — no active order or API unavailable
+  }
+}
+
+loadCurrentOrder();
 
 // ── Sources dropdown ──
 const sourcesBtn   = document.getElementById('sources-toggle');
