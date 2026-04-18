@@ -778,22 +778,52 @@
 
   /* ── Galaxy Map ── */
   .map-section {
-    padding: 1.5rem 2rem 3rem;
     border-top: 1px solid var(--border);
   }
+  .map-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .map-section-header:hover { background: rgba(255,255,255,0.02); }
   .map-section-title {
     font-family: var(--font-mono);
     font-size: 10px;
     color: var(--accent);
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.2rem;
+  }
+  .map-toggle-icon {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    padding-left: 1rem;
   }
   .map-section-sub {
     font-family: var(--font-mono);
     font-size: 10px;
     color: var(--muted);
-    margin-bottom: 1.25rem;
+    margin: 0;
+  }
+  .map-section-body {
+    padding: 0 2rem 2.5rem;
+    display: none;
+  }
+  .map-section-body.open { display: block; }
+  .map-loading {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    padding: 2rem 0;
+    text-align: center;
   }
   #galaxy-map-wrap {
     position: relative;
@@ -1027,19 +1057,27 @@
 </main>
 
 <section class="map-section">
-  <div class="map-section-title">Major Order Theatres — Second Galactic War</div>
-  <div class="map-section-sub">Planets where a Major Order was fought · 2024–2026 · Hover for details · Node color = current faction · Ring = win/loss</div>
-  <div id="galaxy-map-wrap">
-    <svg id="galaxy-map" viewBox="0 0 960 860" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div id="map-tooltip"></div>
-    <div class="map-legend">
-      <div class="map-legend-item"><div class="map-legend-dot" style="background:#c8a84b"></div>Super Earth</div>
-      <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94"></div>Liberated</div>
-      <div class="map-legend-item"><div class="map-legend-dot" style="background:#e8a056"></div>Terminids</div>
-      <div class="map-legend-item"><div class="map-legend-dot" style="background:#e85555"></div>Automatons</div>
-      <div class="map-legend-item"><div class="map-legend-dot" style="background:#9a7ae0"></div>Illuminate</div>
-      <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94; border: 1px solid #8ecf94"></div>Win ring</div>
-      <div class="map-legend-item"><div class="map-legend-dot" style="background:#d98080; border: 1px solid #d98080"></div>Loss ring</div>
+  <div class="map-section-header" id="map-toggle">
+    <div>
+      <div class="map-section-title">Major Order Theatres — Second Galactic War</div>
+      <div class="map-section-sub">Planets where a Major Order was fought · 2024–2026 · Hover for details · Node color = current faction · Ring = win/loss</div>
+    </div>
+    <span class="map-toggle-icon" id="map-toggle-icon">▾ Show Map</span>
+  </div>
+  <div class="map-section-body" id="map-section-body">
+    <div id="galaxy-map-wrap">
+      <div class="map-loading" id="map-loading">Loading galaxy map…</div>
+      <svg id="galaxy-map" viewBox="0 0 960 860" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="map-tooltip"></div>
+      <div class="map-legend">
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#c8a84b"></div>Super Earth</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94"></div>Liberated</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#e8a056"></div>Terminids</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#e85555"></div>Automatons</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#9a7ae0"></div>Illuminate</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94; border: 1px solid #8ecf94"></div>Win ring</div>
+        <div class="map-legend-item"><div class="map-legend-dot" style="background:#d98080; border: 1px solid #d98080"></div>Loss ring</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1060,154 +1098,497 @@ const orders = [
   { n:  1, year:2024, date:`Feb 2024`, name:`Operation Valiant Enclosure`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
   { n:  2, year:2024, date:`Feb 2024`, name:`Operation Bulwark`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
   { n:  3, year:2024, date:`Feb 2024`, name:`Operation Veld Containment`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:  4, year:2024, date:`Mar 2024`, name:`Operation Orion Threshold`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:  4, year:2024, date:`Mar 2024`, name:`Operation Orion Threshold`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+In support of civilian population expansion and new energy demands for FTL travel, the Helldivers are ordered to cull the Terminid swarm within the Quarantine Zone through liberation of several planets.` },
   { n:  5, year:2024, date:`Mar 14, 2024`, name:`Operation Patriot`, enemy:`Automaton`, result:`win`, note:`Well done, Helldivers. Tien Kwan has been returned to the care of Managed Democracy. The Morgunson Arsenal, and its stockpile of freshly-produced Exosuits, were recovered intact. The EXO-45 PATRIOT EXOSUIT is now available for requisition.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Tien Kwan is home to the sole arsenal of new Exosuit technology. It is only a matter of time before the Automatons discover the arsenal and steal it for themselves. Liberate Tien Kwan, before it's too late.` },
   { n:  6, year:2024, date:`Mar 17, 2024`, name:`Operation Termicide`, enemy:`Terminid`, result:`win`, note:`The Terminid Control System is fully activated. The Termicide is working as intended, culling millions of Terminids on the Barrier Planets.  Our citizens may finally rest easy, knowing their children are forever safe from being eaten alive by fascist insects.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Activate Terminid Control System` },
   { n:  7, year:2024, date:`Mar 24, 2024`, name:`Operation Prime Liberation`, enemy:`Terminid`, result:`loss`, note:`Though many Terminids have been mercifully culled, the Helldivers were unable to penetrate as far inside the Quarantine Zone as ordered. The expansion of our citizens to new planets will be reduced in line with the reduction of expected Element 710 to be produced. Further procreation applications will be denied until further notice.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`In support of civilian population expansion and new energy demands for FTL travel, the Helldivers are ordered to cull the Terminid swarm within the Quarantine Zone through liberation of several planets.` },
   { n:  8, year:2024, date:`Mar 26, 2024`, name:`Operation Guardian`, enemy:`Terminid`, result:`win`, note:`The last of the crude solid E-710 has been collected, processed, and shipped off-planet, providing a healthy boost to our colony settlement efforts. The planets can now be left behind to allow the Terminids to repopulate—under careful supervision.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Civilian Biomass Collection Teams (BCTs) are gathering and processing inert Terminids. The Helldivers must maintain our control of the planets until these operations are complete.` },
   { n:  9, year:2024, date:`Apr 5, 2024`, name:`Operation Swift Disassembly (Phase 1: Disrupt Communications)`, enemy:`Automaton`, result:`win`, note:`The Automaton threat has been fully eradicated from our galaxy. Our citizens are safe, our heroic fallen avenged. With the bots eradicated and bugs contained, the galaxy is free once more. The supposed threat posed by the so-called "Reclamation" can be considered fully ended. Out of an abundance of caution, SEAF teams will continue to search what remains of the Automaton facilities and servers for any additional intelligence.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Several weeks ago, our citizens watched in horror as Malevelon Creek fell to the Automatons. Millions of valiant heroes perished attempting to defend it. For too long, the bots have maintained their illegal occupation, desecrating the memory of the fallen by rapidly depleting the planet's exceptionally rich rhodium deposits. This travesty will be allowed to continue no longer. Take vengeance for the fallen. Honor our heroes. End the theft of valuable minerals. Liberate Malevelon Creek.` },
-  { n: 10, year:2024, date:`Apr 16, 2024`, name:`Operation Swift Disassembly (Phase 2: Reduce Non-Sentient Combatant Production)`, enemy:`Automaton`, result:`loss`, note:`The Automatons have seized control of many innocent and once-beautiful worlds. The valiant and tireless defense raised by the Helldivers was commendable, but it was not enough to stop such a large and cowardly assault. Any colonists not driven from their homes were likely slaughtered, their votes forever lost.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 10, year:2024, date:`Apr 16, 2024`, name:`Operation Swift Disassembly (Phase 2: Reduce Non-Sentient Combatant Production)`, enemy:`Automaton`, result:`loss`, note:`The Automatons have seized control of many innocent and once-beautiful worlds. The valiant and tireless defense raised by the Helldivers was commendable, but it was not enough to stop such a large and cowardly assault. Any colonists not driven from their homes were likely slaughtered, their votes forever lost.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+OP SWIFT DISASSEMBLY, PHASE II: Reduce Non-Sentient Combatant Production. Intel analysis have identified the planet Tibit as the most significant producer of illegal Automaton combatants. Liberating this planet would significantly impact the enemy's capacity to replenish decommissioned socialists. 
+
+It would also limit further theft of the planet's natural resources from future...` },
   { n: 11, year:2024, date:`Apr 21, 2024`, name:`Operation Quiet Creek`, enemy:`Automaton`, result:`win`, note:`The Automaton Invasion Fleet has been repelled. The bots committed much of their reserves to this attack. Even the large-scale deployment of the Factory Strider could not break the resolve of the Helldivers. The situation remains dire. The Automatons still illegally occupy vast swaths of our territory. But with this victory, the Helldivers have won the opportunity to turn back the tide.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`With the Menkent Line established, the Automaton Fleet has been forced to divert their plans. Now, they are attempting a concerted effort to punch through at a single planet. The Automatons are likely to muster the entirety of their strength for this endeavor. You must outlast the enemy. Hold the planet, no matter the cost.` },
   { n: 12, year:2024, date:`May 26, 2024`, name:`Operation Swift Disassembly (Phase 3: Hold Ground)`, enemy:`Automaton`, result:`win`, note:`The Automaton Petafactory on Varylia 5 has been liberated by the Helldivers, thwarting their expansion and allowing production to begin on the EXO-49 EMANCIPATOR EXOSUIT. Consult the Galactic Map on your Super Destroyer for a full briefing.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`We have acquired imagery of a massive new Automaton factory nearing completion on the planet Varylia 5. This factory, if liberated, could be retrofitted to allow the construction of a dual-autocannon Exosuit variant: the EXO-49 EMANCIPATOR EXOSUIT. The Helldivers are ordered to liberate Varylia 5. Consult the Galactic Map on your Super Destroyer for a complete briefing.` },
-  { n: 13, year:2024, date:`Apr 2024`, name:`Operation Swift Disassembly (Phase 4: Annihilation)`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 14, year:2024, date:`Apr 2024`, name:`Operation Acreage`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 15, year:2024, date:`Apr 2024`, name:`Operation Courageous Defense`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 16, year:2024, date:`Apr 2024`, name:`Operation Menkent Line`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 17, year:2024, date:`Apr 2024`, name:`Operation Hard Flank`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 13, year:2024, date:`Apr 2024`, name:`Operation Swift Disassembly (Phase 4: Annihilation)`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+OP SWIFT DISASSEMBLY, PHASE IV (FINAL): ANNIHILATION. All Helldivers are ordered to make an all-out push to completely destroy the Automaton Legion. Despite the enemy's losses, Automaton messages still include references to "The Reclamation." They must be annihilated before this plan can be carried out.
+
+Countless Helldivers gave their lives to acquire this opportunity. Do not ...` },
+  { n: 14, year:2024, date:`Apr 2024`, name:`Operation Acreage`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+With the Automatons eradicated and Terminids contained, the time has come to work towards a more prosperous future for all citizens.
+
+To that end, construction of new, safer, and more efficient E-710 farms will soon commence. On these farms, Terminids will be raised in spacious enclosures and enriched with state-of-the-art nutritional supplements, all under careful supervision....` },
+  { n: 15, year:2024, date:`Apr 2024`, name:`Operation Courageous Defense`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`HIGH PRIORITY BROADCAST. ALL UNITS TO LIBCON 1.
+
+FEDERATION UNDER ATTACK. MULTIPLE PLANETS HAVE FALLEN.
+
+A massive Automaton Invasion Fleet, comprising tens of thousands of warships, arrived from FTL jump to the Valdis Sector and overran nearly every planet in just hours. Attacks on communications networks delayed warning until now. SEAF reserves are scrambling. All Helldivers are called to dep...` },
+  { n: 16, year:2024, date:`Apr 2024`, name:`Operation Menkent Line`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+We must halt the Automaton advance. 
+
+Helldivers are ordered to establish and hold the Menkent Line, consisting of the planets Menkent and Lesath. Establishing this defensive line will allow SEAF Engineers to begin construction of orbital defenses on those planets, deterring the advance of the Automaton Fleet and allowing counteroffensive preparations to begin.` },
+  { n: 17, year:2024, date:`Apr 2024`, name:`Operation Hard Flank`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+With the Menkent Line established, the Automaton Fleet has been forced to divert their plans. Now, they are attempting a concerted effort to punch through at a single planet.
+
+The Automatons are likely to muster the entirety of their strength for this endeavor. You must outlast the enemy. 
+
+Hold the planet, no matter the cost.` },
   { n: 18, year:2024, date:`Apr 2024`, name:`Operation Bio Reaper`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
   { n: 19, year:2024, date:`Apr 2024`, name:`Operation Enduring Bulwark`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 20, year:2024, date:`Apr 2024`, name:`Operation Legitimate Undertaking (Phase 1: Citizen Rescue)`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 21, year:2024, date:`Apr 2024`, name:`Operation Firebreak`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 22, year:2024, date:`Jun 2, 2024`, name:`Operation Outbreak`, enemy:`Terminid`, result:`loss`, note:`The path to the Terminid Supercolony on Meridia is clear. Weaponized payloads of Dark Fluid have been constructed and deployed across the Super Destroyer Fleet. Phase 2 will begin imminently.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 20, year:2024, date:`Apr 2024`, name:`Operation Legitimate Undertaking (Phase 1: Citizen Rescue)`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW OPERATION ORDER: "LEGITIMATE UNDERTAKING"
+
+Phase I: Citizen Rescue. Intel has identified surviving citizens on two planets:
+
+On  Choohe, citizens who have proved their loyalty through testing of a new Fortification Stratagem are trapped.
+
+On Penta, citizens who have synthesized tons of caustic chemicals for a new Support Weapon Stratagem are awaiting rescue.
+
+Likely, only the citizens and w...` },
+  { n: 21, year:2024, date:`Apr 2024`, name:`Operation Firebreak`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Freedom is under attack once more. In an act of sinister synchronicity, both the Terminids and Automatons have launched large-scale assaults. The Helldivers must now defend our citizens on two fronts at once.` },
+  { n: 22, year:2024, date:`Jun 2, 2024`, name:`Operation Outbreak`, enemy:`Terminid`, result:`loss`, note:`The path to the Terminid Supercolony on Meridia is clear. Weaponized payloads of Dark Fluid have been constructed and deployed across the Super Destroyer Fleet. Phase 2 will begin imminently.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Sudden, massive outbreaks, traced back to the Meridian Supercolony, have erupted on multiple planets. The Supercolony appears to be producing far more Terminid spores than other infested planets, leading to unpredictable outbreaks within its vicinity.
+
+The Helldivers must contain these outbreaks immediately, before they spread out of control.` },
   { n: 23, year:2024, date:`Jun 14, 2024`, name:`Operation Metallic Harvest`, enemy:`Automaton`, result:`loss`, note:`The Helldivers succeeded in liberating Vernen Wells in time to save the civilians trapped within. Already, the very sick children are en route to Super Citizen Mary's Hospital for Tragically Ill Youths, where they will receive the best care the Federation has to offer. Marfark remains in Automaton hands. MD-17 Anti-Tank Mine factories have been shuttered for the time being, following multiple material shortfalls.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`High Command has received two urgent requests for aid on planets that recently fell to the Automaton occupation: Survivors in the wreckage of a children's hospital are trapped on Vernen Wells, while explosives critical for MD-17 Anti-Tank Mines are trapped on Marfark. Consult the Galactic Map on your ship for more information.` },
   { n: 24, year:2024, date:`Jun 24, 2024`, name:`Operation Architect`, enemy:`Automaton`, result:`win`, note:`The Automatons have been rebuffed. The territory so many sacrificed to liberate remains safe in the hands of Freedom. Consult the Galactic Map on your ship for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Automatons have been making incursions into the Xzar Sector, in an effort to re-steal the sites of their introductory crimes. Consult the Galactic Map on your ship for more information.` },
   { n: 25, year:2024, date:`Jun 29, 2024`, name:`Operation Freedom's Calling`, enemy:`Automaton`, result:`loss`, note:`With great effort, the Terminid expansion has been significantly limited by the actions of the Helldivers. Though the bugs now infest some once-beautiful worlds, many remain unblemished by tyranny, ready for Democratic settlement. Excising the infestation will be taxing, but will require far less expenditure of resources than our worst-case scenarios predicted.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Terminids are infesting untarnished worlds in the Falstaff and Jin Xi sectors. This greedy annexation will not be tolerated. Consult the Galactic Map on your ship for more information.` },
-  { n: 26, year:2024, date:`May 2024`, name:`Operation Emancipator`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 27, year:2024, date:`May 2024`, name:`Operation Enduring Peace (Phase 1: Forge a Path)`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 28, year:2024, date:`May 2024`, name:`Operation Enduring Peace (Phase 2: Destroy Meridia)`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 26, year:2024, date:`May 2024`, name:`Operation Emancipator`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+We have acquired imagery of a massive new Automaton factory nearing completion on the planet Varylia 5. This factory, if liberated, could be retrofitted to allow the construction of a dual-autocannon Exosuit variant: the EXO-49 EMANCIPATOR EXOSUIT.
+
+The Helldivers are ordered to liberate Varylia 5. Consult the Galactic Map on your Super Destroyer for a complete briefing.` },
+  { n: 27, year:2024, date:`May 2024`, name:`Operation Enduring Peace (Phase 1: Forge a Path)`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`OPERATION "ENDURING PEACE"—PHASE I
+
+The time has come to address the Terminid Supercolony on Meridia. Using an experimental substance weaponized by our top scientific minds, the Helldivers will conduct a targeted strike to permanently end the threat posed by the Supercolony.
+
+The first phase of this operation is to secure a route to Meridia, and hold the staging ground until sufficient quantiti...` },
+  { n: 28, year:2024, date:`May 2024`, name:`Operation Enduring Peace (Phase 2: Destroy Meridia)`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`OPERATION "ENDURING PEACE"—PHASE II (FINAL)
+
+The time has come to eradicate the Terminid Supercolony completely. The Helldivers will deploy to the surface of Meridia to deploy partial payloads of Dark Fluid across the planet. Once a critical mass is reached, the Dark Fluid will accrete into a superdense mass, triggering total planetary implosion. The Supercolony, and its hyper-reproductive Term...` },
   { n: 29, year:2024, date:`Jul 13, 2024`, name:`Operation Destiny Manifested`, enemy:`Terminid`, result:`win`, note:`The vast quantities of Terminids eradicated by the Helldivers has greatly aided the Ministry of Science's Terminid Research Initiative. Though much work remains, our understanding of the most efficacious bug-eradication methodologies has been thoroughly advanced.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Helldivers are ordered to kill the designated number of Terminids—ideally utilizing a variety of means—in order to aid in scientific research. Consult the Galactic Map on your ship for more information.` },
   { n: 30, year:2024, date:`Jul 14, 2024`, name:`Operation Firewall`, enemy:`Automaton`, result:`win`, note:`The Automaton Dominion has been fractured by the mighty assault rifle of Freedom. Thanks to the courage and obedience of the Helldivers, a large swath of Automaton-held planets are cut off from Cyberstan, disrupting their supplies and communications. This will significantly impact the defenses on those planets, and it will take the Automatons time to recover. Until then, and so long as our barrier holds, the cut-off planets are vulnerable to our just liberation.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Helldivers are ordered to cut a line through the Automaton front, joining our forces and dividing theirs in two at the Andromeda Sector. Success in this endeavor will interrupt bot supply routes and comms lines, weakening their cut-off forces. Consult the Galactic Map on your Super Destroyer for more information.` },
   { n: 31, year:2024, date:`Jul 30, 2024`, name:`Operation Trolley Problem`, enemy:`Automaton`, result:`loss`, note:`The valiant sacrifice of millions of our most well-trained and brave heroes was not enough to pry free the collectivist death-grip on our stolen worlds.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Helldivers are ordered to reclaim more ground from the Automatons. However, the enemy has deployed Orbital Cannons across their territories. The Orbital Cannons are targeting SEAF air forces, extending extraction times. Liberating a bot planet will allow temporary return to normal extraction. If two planets are liberated within 12 hours of each other, shorter extraction times will be possible for the remainder of the order.` },
-  { n: 32, year:2024, date:`Jun 2024`, name:`Operation Hive Breaker`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 33, year:2024, date:`Jun 2024`, name:`Operation Lockdown`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 32, year:2024, date:`Jun 2024`, name:`Operation Hive Breaker`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+With the Supercolony destroyed, it is now finally possible to clear out the spreading Terminid infestation. Since the Terminids corrupted the perfectly-designed Terminid Control System, they have infected world after world with their tyranny, forcing colonists to evacuate their homesteads. Now, the time has come to reclaim the lost dreams of our hardworking citizens.
+
+Consult t...` },
+  { n: 33, year:2024, date:`Jun 2024`, name:`Operation Lockdown`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+ 
+Our analysts have identified a large Automaton Data Center, codenamed Database One, deep within Automaton territory. It is protected by exceptionally robust encryption protocols. Whatever data is stored there, much effort has been expended to keep it hidden. 
+
+The Helldivers are ordered to liberate the planet, capturing Database One and allowing manual extraction of the data.` },
   { n: 34, year:2024, date:`Aug 9, 2024`, name:`Operation Steel Dome`, enemy:`Terminid`, result:`win`, note:`This latest unnatural slew of Terminid abominations has been quelled by the intrepid Helldivers. Even the re-emergence of the Impaler could not diminish the Helldivers' fervor for duty. However, a new and more potent threat has emerged, one which defies conventional combat. The interstellar spore cloud has continued to grow. It now encompasses several star systems, and is growing more every day. This unnatural phenomenon has been named The Gloom.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Terminids have overrun SEAF recon posts on Socorro III. Partial reports indicate the possibility of new Terminid variants. Most likely, these reports are exaggerations; however, the Terminid incursion is undoubtable. The Helldivers are to deploy to Socorro III and eradicate as many Terminids as possible. Further, the Helldivers are ordered to liberate all nearby planets, to prevent the spread of any new Terminid variants that may or may not exist.` },
   { n: 35, year:2024, date:`Aug 31, 2024`, name:`Operation Starslayer`, enemy:`Automaton`, result:`win`, note:`Despite heroic conservation efforts, and millions of Automaton militants recycled into useful scrap metals, the Helldivers were unable to secure sufficient resources to rectify supply shortages. Fleetwide distribution of the Orbital Napalm Barrage will be delayed.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Ministry of Defense has finalized preparations to augment Super Destroyers with the capability to fire Orbital Napalm Barrages. However, critical shortages of polystyrene foam and scrap metal has caused production to stall. Liberate the polystyrene stockpile on Vernen Wells, and collect enough Automaton scrap metal to jump-start Orbital Napalm Barrage production.` },
-  { n: 36, year:2024, date:`Jul 2024`, name:`Operation Hardcase`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 37, year:2024, date:`Jul 2024`, name:`Operation Andromeda`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 38, year:2024, date:`Jul 2024`, name:`Operation Righteous Expunge`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 39, year:2024, date:`Jul 2024`, name:`Operation Glorious Xenocide`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 40, year:2024, date:`Jul 2024`, name:`Operation Liberty Crush`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 36, year:2024, date:`Jul 2024`, name:`Operation Hardcase`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Terminids are infesting untarnished worlds in the Falstaff and Jin Xi sectors. This greedy annexation will not be tolerated. Consult the Galactic Map on your ship for more information.` },
+  { n: 37, year:2024, date:`Jul 2024`, name:`Operation Andromeda`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Helldivers are ordered to cut a line through the Automaton front, joining our forces and dividing theirs in two at the Andromeda Sector. Success in this endeavor will interrupt bot supply routes and comms lines, weakening their cut-off forces.
+
+Consult the Galactic Map on your Super Destroyer for more information.` },
+  { n: 38, year:2024, date:`Jul 2024`, name:`Operation Righteous Expunge`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+With the Automaton forces in disarray, the opportunity has come to liberate the territory the Automatons illegally occupy. 
+
+Time is of the essence. The Automaton defenses will recover in short order. We must press the advantage now.` },
+  { n: 39, year:2024, date:`Jul 2024`, name:`Operation Glorious Xenocide`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Following the Helldivers' inspiringly rapid support of the Terminid Research Initiative, the Ministry of Science has requested a second, much larger research trial.
+
+High Command has authorized a rotating series of augmenting Stratagems for the duration of this trial, in support of scientific progress.` },
+  { n: 40, year:2024, date:`Jul 2024`, name:`Operation Liberty Crush`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Helldivers are ordered to reclaim more ground from the Automatons. However, the enemy has deployed Orbital Cannons across their territories.
+
+The Orbital Cannons are targeting SEAF air forces, extending extraction times.
+
+Liberating a bot planet will allow temporary return to normal extraction. If two planets are liberated within 12 hours of each other, shorter extraction t...` },
   { n: 41, year:2024, date:`Sep 9, 2024`, name:`Operation Vengeful Cleansing`, enemy:`Multi`, result:`loss`, note:`The Automatons have been rebuffed once more, their territorial ambitions stymied by the ever-watchful Helldivers. The titanium deposits on Imber were retained, and the Helldivers defended most of the bots attempted incursions into Super Earth territory.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Automatons have launched another brazen expansion in an attempt to steal more territory from hardworking Super Earth citizens. Intercepted communications indicate this latest incursion is targeting a large repository of titanium on Imber, possibly for use in construction of some kind of enhanced strike force.` },
-  { n: 42, year:2024, date:`Sep 19, 2024`, name:`Operation Benevolent Sanitation`, enemy:`Terminid`, result:`win`, note:`Terminid population levels have been reduced, but by lower than the targeted amount required to fully bring their population under control.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 42, year:2024, date:`Sep 19, 2024`, name:`Operation Benevolent Sanitation`, enemy:`Terminid`, result:`win`, note:`Terminid population levels have been reduced, but by lower than the targeted amount required to fully bring their population under control.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+A massive Terminid outbreak has erupted out of the Gloom into the Jin Xi sector. Colonies in the Jin Xi sector are only weeks old, but millions of families are trapped within, awaiting emergency evacuation.
+
+All Helldivers are called to the colonies' defense.` },
   { n: 43, year:2024, date:`Sep 27, 2024`, name:`Operation Lighthouse`, enemy:`Terminid`, result:`win`, note:`The Helldivers have managed to wrench Gaellivare from the Automatons' clutches, securing an ideal construction site for the Democracy Space Station. A DSS Logistics Hub has been set up nearby. To build a weapon of mass liberation of this size, we will need to make significant advancements in three key areas: zero-g materials science, FTL propulsion, and gigastructure staffing. It is imperative that the DSS be completed before our enemies discover its location and attempt to destroy it. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Months ago, the Helldivers liberated GW1-era blueprints for an interplanetary battle station from planet X-45. Today, after intense research and planning, construction of the Democracy Space Station is ready to begin. 2 planets have been identified with sufficiently strong magnetospheres for safe construction, both under Automaton control. One must be liberated. Consult your Galactic Map for more information.` },
-  { n: 44, year:2024, date:`Aug 2024`, name:`Operation Prometheus`, enemy:`Terminid`, result:`partial`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 45, year:2024, date:`Aug 2024`, name:`Operation People's Shield`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 46, year:2024, date:`Aug 2024`, name:`Operation Brute Force`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 47, year:2024, date:`Aug 2024`, name:`Operation Ecologic Immolation`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 44, year:2024, date:`Aug 2024`, name:`Operation Prometheus`, enemy:`Terminid`, result:`partial`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Terminids have overrun SEAF recon posts on Socorro III. Partial reports indicate the possibility of new Terminid variants. Most likely, these reports are exaggerations; however, the Terminid incursion is undoubtable.
+
+The Helldivers are to deploy to Socorro III and eradicate as many Terminids as possible. Further, the Helldivers are ordered to liberate all nearby planets, to pr...` },
+  { n: 45, year:2024, date:`Aug 2024`, name:`Operation People's Shield`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+While our attention has been diverted by the Gloom, the Automatons have crept closer to Super Earth. The Helldivers are ordered to launch an assault on the Automatons to push them back. 
+
+Intel indicates that additional Automaton attacks are expected within the next few days. Remain vigilant, and defend against any further Automaton incursions.` },
+  { n: 46, year:2024, date:`Aug 2024`, name:`Operation Brute Force`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Efforts to research the growing Terminid spore cloud known as the Gloom have failed. But we will not allow a mere lack of scientific understanding to thwart decisive action. The Helldivers are ordered to deploy in full force to hold back the Terminid swarm with the deployment of every weapon in their arsenal. 
+
+Consult the Galactic Map on your Destroyer for more information.` },
+  { n: 47, year:2024, date:`Aug 2024`, name:`Operation Ecologic Immolation`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Ministry of Defense has finalized preparations to augment Super Destroyers with the capability to fire Orbital Napalm Barrages. However, critical shortages of polystyrene foam and scrap metal has caused production to stall.
+
+Liberate the polystyrene stockpile on Vernen Wells, and collect enough Automaton scrap metal to jump-start Orbital Napalm Barrage production.` },
   { n: 48, year:2024, date:`Oct 1, 2024`, name:`Operation Overrun`, enemy:`Terminid`, result:`win`, note:`With the planet safely held, ground has been broken on the Xenoentomology Center on Turing. Super Earth's leading Terminid experts and FTL engineers from across the galaxy have converged on the planet, to develop High-Efficiency Alcubierre Drives. These new drives, once built, will enable the Democracy Space Station to warp between planets at the Helldivers' direction, dispensing Freedom anywhere it is required.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Democracy Space Station has entered the first of four construction phases. Reaching the next stage demands significant scientific breakthroughs. The Helldivers are ordered to clear Turing of Terminid presence, to allow the Ministry of Science to establish a new, state-of-the-art Xenoentomology Center. The Center will prototype and develop new High-Efficiency Alcubierre Drives, capable of effectively transporting gigastructures like the DSS.` },
   { n: 49, year:2024, date:`Oct 7, 2024`, name:`Operation Titanium Belt`, enemy:`Automaton`, result:`win`, note:`Claorell has been liberated from the circuit-operated grip of the Automaton Legion. An extensive network of tunnels penetrating to the depths of the planet have been flushed of all Automaton presence, and filled with eager Super Earth miners ready to construct the Deep Mantle Forge Complex.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The DSS will require the construction of the Deep Mantle Forge Complex, which will use extreme heat and pressure near a planet's core to create large quantities of new, powerful alloy. We have identified atmospheric readings on Claorell indicating the Automatons are already engaging in deep-mantle mining operations on the planet. The Helldivers are directed to liberate Claorell and its deep-mantle mining complex from the Automatons.` },
   { n: 50, year:2024, date:`Oct 14, 2024`, name:`Operation Critical Mass`, enemy:`Terminid`, result:`loss`, note:`The Helldivers have established and held a protective border around Acamar IV, allowing the successful construction of the first-ever Terminid Research Preserve. Our intrepid Xenoentomologists have conducted an inaugural specimen collection foray, and are already reporting great strides towards our understanding of E-710 extraction and exploitation.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`In order to aid research of High-Efficiency Alcubierre Drives, the Helldivers are ordered to help establish a multi-planet Terminid Research Preserve on Acamar IV. The Helldivers are to clear and hold the surrounding planets in order to establish a quarantine. Inside the quarantine, Terminid specimens will be seeded inside tightly-controlled multi-acre facilities, where they can be studied by researchers as needed.` },
   { n: 51, year:2024, date:`Oct 31, 2024`, name:`Operation Liberty Tide`, enemy:`Multi`, result:`loss`, note:`Despite heroic effort, the Helldivers were unable to complete all three objectives set by High Command. Consult the Galactic Map on your ship for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Helldivers are ordered to accomplish 3 objectives: capture an Automaton database containing critical intel regarding the Jet Brigade, re-secure the Terminid Research Preserve, and limit Automaton territorial expansion.` },
-  { n: 52, year:2024, date:`Sep 2024`, name:`Operation Leap Forward`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 53, year:2024, date:`Sep 2024`, name:`Operation Alcubierre-II`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 52, year:2024, date:`Sep 2024`, name:`Operation Leap Forward`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Automatons have launched another brazen expansion in an attempt to steal more territory from hardworking Super Earth citizens. Intercepted communications indicate this latest incursion is targeting a large repository of titanium on Imber, possibly for use in construction of some kind of enhanced strike force.` },
+  { n: 53, year:2024, date:`Sep 2024`, name:`Operation Alcubierre-II`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+In order to aid research of High-Efficiency Alcubierre Drives, the Helldivers are ordered to help establish a multi-planet Terminid Research Preserve on Acamar IV. The Helldivers are to clear and hold the surrounding planets in order to establish a quarantine. Inside the quarantine, Terminid specimens will be seeded inside tightly-controlled multi-acre facilities, where they ca...` },
   { n: 54, year:2024, date:`Nov 7, 2024`, name:`Operation Freedom's Forge`, enemy:`Automaton`, result:`win`, note:`The Helldivers have managed to hold all designated planets, allowing their citizens to safely evacuate to the DSS. The DSS is now fully staffed, and the project has entered its final phase. As we look towards our bright future, we thank the Helldivers, whose hard work will soon allow the DSS to blast away all shadows.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The DSS is in its third construction stage. Before it can be activated, it must be fully staffed. Hold the designated planets while their citizens are relocated to the DSS. Consult the Galactic Map on your ship for more information.` },
   { n: 55, year:2024, date:`Nov 14, 2024`, name:`Operation Bulwark of Democracy`, enemy:`Automaton`, result:`win`, note:`Gaellivare has been held for the designated timeframe. However, the planet, and the DSS itself, remain imperiled. The fight is not over. High Command will monitor the situation. Further guidance will be issued once the fate of Gaellivare is decided—one way or the other.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The time has come. The Democracy Space Station is fully constructed and ready for activation. The sole remaining step to bring the station online is the procurement of enough E-710 to power its High-Efficiency Alcubierre Drives. Haste is critical. The rebuilt Automaton Jet Brigade has been spotted amassing on Vernen Wells. An attack on the DSS Logistics Hub on Tarsh is likely imminent. If the Hub is seized, the DSS itself will be next.` },
   { n: 56, year:2024, date:`Nov 28, 2024`, name:`Operation Ring of Freedom`, enemy:`Terminid`, result:`win`, note:`Thanks to the Helldivers' resolute commitment to scientific advancement, the Machine Gun Efficacy Review has been completed, with more than enough data collected to achieve its investigative aims. After thorough and Democratically-driven testing, the #STRATAGEM was the first to reach the goal of 50 million enemies dispatched. All Helldiver arsenals will be temporarily augmented with the #STRATAGEM.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Ministry of Defense is conducting a machine gun weapons efficacy review. In service of this review, the Helldivers are tasked with data collection. The Helldivers are ordered to kill the enemies of Freedom using the following Support Weapons: -The M-105 Stalwart -The MG-43 Machine Gun -The MG-206 Heavy Machine Gun The machine gun that reaches its targeted kill goal first will be understood as the most efficacious and Helldiver-approved machine gun.` },
-  { n: 57, year:2024, date:`Oct 2024`, name:`Operation Jet Brigade`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 58, year:2024, date:`Oct 2024`, name:`Operation Crossroads`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 59, year:2024, date:`Oct 2024`, name:`Operation Liberty Day 2184`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 60, year:2024, date:`Oct 2024`, name:`Operation Adamant Resolve`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 57, year:2024, date:`Oct 2024`, name:`Operation Jet Brigade`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The need to expand the protective planetary buffer surrounding the DSS has become clear. Liberating Lesath would insulate the DSS from a sudden assault by a resurgent Jet Brigade.
+
+However, a Terminid outbreak has just erupted, threatening the Terminid Research Preserve on Acamar IV. 
+
+What to prioritize is a difficult decision—one which High Command leaves in the capable and u...` },
+  { n: 58, year:2024, date:`Oct 2024`, name:`Operation Crossroads`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Helldivers are ordered to accomplish 3 objectives: capture an Automaton database containing critical intel regarding the Jet Brigade, re-secure the Terminid Research Preserve, and limit Automaton territorial expansion.` },
+  { n: 59, year:2024, date:`Oct 2024`, name:`Operation Liberty Day 2184`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The DSS will require the construction of the Deep Mantle Forge Complex, which will use extreme heat and pressure near a planet's core to create large quantities of new, powerful alloy.
+
+We have identified atmospheric readings on Claorell indicating the Automatons are already engaging in deep-mantle mining operations on the planet.
+
+The Helldivers are directed to liberate Claore...` },
+  { n: 60, year:2024, date:`Oct 2024`, name:`Operation Adamant Resolve`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Automatons have refused to accept the peaceful and righteous liberation of Claorell. In an act of brazen escalation, they seek to steal the planet so many Helldivers gave their lives to liberate.  This wanton aggression will not be tolerated.
+
+The Helldivers are ordered to hold Claorell at all costs.` },
   { n: 61, year:2024, date:`Dec 14, 2024`, name:`Operation Courageous Exodus`, enemy:`Terminid`, result:`win`, note:`The resurgent Illuminate have been repelled by the Helldivers. Consult the Galactic Map on your ship for additional information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Ministry of Defense has awarded a multitrillion-Supercredit contract to AM Defense to expand production of high-quality military equipment for the Helldivers. AM Defense will construct a massive, multi-complex Factory Hub on #PLANET. Readings indicate a Terminid expansion towards #PLANET1. The Helldivers must protect the investments of our security partners.` },
   { n: 62, year:2024, date:`Dec 23, 2024`, name:`Operation Spark of Liberty`, enemy:`Multi`, result:`win`, note:`Decisive Fascism-repulsion operations by the Helldivers in vicinity of FENRIR III has facilitated the safe construction of a new Center of Science. Already, the project has yielded valuable insights. Consult the Galactic Map on your ship for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Novel anomalous phenomena has been observed in the vicinity of the Meridian Singularity. Astronomers have reported fluctuations in the event horizon and electromagnetic flares. These developments demand further investigation. High Command has ordered the construction of a new Center of Science on FENRIR III.  The Helldivers must clear the planet and nearby area of any Terminid infestation in order to facilitate its safe construction.` },
   { n: 63, year:2024, date:`Dec 30, 2024`, name:`Operation Balance of Liberty`, enemy:`Automaton`, result:`win`, note:`The Illuminate have been forced to pay a heavy toll for their merciless campaign of terror. The Helldivers killed vast swaths of the bloodthirsty alien species, sending a message of what is to come should they choose to continue their aggression. Consult the Galactic Map on your ship for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Helldivers are ordered to kill as many Illuminate and Voteless as possible over the coming wave of attacks. This will both deter the enemy and allow the Ministry of Science to autopsy the remains, possibly yielding intel about the Illuminate and how the Voteless are created.` },
-  { n: 64, year:2024, date:`Nov 2024`, name:`Operation Iron Rain`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 65, year:2024, date:`Nov 2024`, name:`Operation Jetclipper`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 66, year:2024, date:`Dec 2024`, name:`Operation Crop Dust`, enemy:`Multi`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 67, year:2024, date:`Dec 2024`, name:`Operation Bughammer`, enemy:`Terminid`, result:`partial`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 68, year:2024, date:`Dec 2024`, name:`Operation Ancient Vengeance`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 69, year:2024, date:`Dec 2024`, name:`Operation Squid Game`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 70, year:2024, date:`Dec 2024`, name:`Operation Wormhole Spaghetti`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 71, year:2024, date:`Dec 2024`, name:`Festival of Reckoning 2184 - Operation Spread Democratic Cheer`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 72, year:2024, date:`Dec 2024`, name:`Operation Hydra's Head`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 64, year:2024, date:`Nov 2024`, name:`Operation Iron Rain`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The time has come. The Democracy Space Station is fully constructed and ready for activation. The sole remaining step to bring the station online is the procurement of enough E-710 to power its High-Efficiency Alcubierre Drives.
+
+Haste is critical. The rebuilt Automaton Jet Brigade has been spotted amassing on Vernen Wells. An attack on the DSS Logistics Hub on Tarsh is likely ...` },
+  { n: 65, year:2024, date:`Nov 2024`, name:`Operation Jetclipper`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Though the Jet Brigade was routed by the Helldivers some time ago, the factories that produced them are still out there. 
+
+The Helldivers are ordered to gather intel on the factories' location by: 
+- Liberating the Jet brigade staging ground on Choohe.
+- Dismantling enough bots to find any that operated alongside the Jet Brigade.` },
+  { n: 66, year:2024, date:`Dec 2024`, name:`Operation Crop Dust`, enemy:`Multi`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Efforts to expand the arsenal of chemical deterrents have been interrupted by an uptick in colonial labor shrinkage. Mass production of new MD-8 Gas Mines is now bottlenecked by chlorine shortages.
+
+The Helldivers are ordered to reclaim salt-rich planets from our enemies. If all planets can be secured within the specified timeframe, the MD-8 Gas Mines will be made available for...` },
+  { n: 67, year:2024, date:`Dec 2024`, name:`Operation Bughammer`, enemy:`Terminid`, result:`partial`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Ministry of Defense has awarded a multitrillion-Supercredit contract to AM Defense to expand production of high-quality military equipment for the Helldivers. AM Defense will construct a massive, multi-complex Factory Hub on #PLANET.
+
+Readings indicate a Terminid expansion towards #PLANET1. The Helldivers must protect the investments of our security partners.` },
+  { n: 68, year:2024, date:`Dec 2024`, name:`Operation Ancient Vengeance`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Illuminate have resurfaced. Another undefended outer colony is under attack. All Helldivers are ordered to converge on GENESIS PRIME and eradicate the remnants of this alien threat.` },
+  { n: 69, year:2024, date:`Dec 2024`, name:`Operation Squid Game`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Helldivers are ordered to kill as many Illuminate and Voteless as possible over the coming wave of attacks. This will both deter the enemy and allow the Ministry of Science to autopsy the remains, possibly yielding intel about the Illuminate and how the Voteless are created.` },
+  { n: 70, year:2024, date:`Dec 2024`, name:`Operation Wormhole Spaghetti`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Novel anomalous phenomena has been observed in the vicinity of the Meridian Singularity. Astronomers have reported fluctuations in the event horizon and electromagnetic flares. 
+
+These developments demand further investigation. High Command has ordered the construction of a new Center of Science on FENRIR III.  The Helldivers must clear the planet and nearby area of any Termini...` },
+  { n: 71, year:2024, date:`Dec 2024`, name:`Festival of Reckoning 2184 - Operation Spread Democratic Cheer`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Ministry of Defense is conducting a machine gun weapons efficacy review. In service of this review, the Helldivers are tasked with data collection.
+
+The Helldivers are ordered to kill the enemies of Freedom using the following Support Weapons:
+-The M-105 Stalwart
+-The MG-43 Machine Gun
+-The MG-206 Heavy Machine Gun
+
+The machine gun that reaches its targeted kill goal first ...` },
+  { n: 72, year:2024, date:`Dec 2024`, name:`Operation Hydra's Head`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Helldivers are ordered to secure MASTIA to facilitate the construction of a new Center for Citizen Surveillance & Security. Consult the Galactic Map on your ship for more information.` },
   { n: 73, year:2025, date:`Feb 2, 2025`, name:`Operation Liberty Shield`, enemy:`Automaton`, result:`win`, note:`The Automaton Jet Brigade Factories on CHORT BAY have been destroyed. The Automatons no longer possess the means to rebuild the aerial marauders that destroyed so many lives.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Intel from the Staging Grounds for the Automaton Jet Brigade on Choohe has finally been deciphered, and the source of the violent unit identified. The Factories that produced the robotic marauders is located on CHORT BAY. The Helldivers are ordered to strike deep into Automaton territory with the objective of liberating CHORT BAY and destroying the Jet Brigade Factories there.` },
   { n: 74, year:2025, date:`Feb 20, 2025`, name:`Operation Farsight Breach`, enemy:`Terminid`, result:`win`, note:`Despite the appearance of the Predator Strain, the Terminid wave has shattered against the Helldiver breakwater. The researchers at the Center of Science are safe. These researchers have made a startling discovery: the energy produced by E-710 combustion matches all known properties of Dark Energy. Studying E-710, then, could help us understand Dark Energy—and the means by which the Illuminate are moving the Meridian Singularity.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Super Earth High Command has ordered immediate deployment to what may represent a massive, untapped source of E-710: the Gloom. Consult the Galactic Map on your ship for more information.` },
   { n: 75, year:2025, date:`Feb 20, 2025`, name:`Operation Democracy Delivered`, enemy:`Illuminate`, result:`loss`, note:`The Helldivers have successfully plunged through the impenetrable Gloom and surveyed one of its Terminid-plagued worlds. The results from this survey confirm that Gloom-mutated Terminid populations are saturated with high-yield specimens. The influx of E-710 secured during this operation will enable accelerated research on the Meridian Singularity. It is only a matter of time until we know how the Illuminate are moving the Singularity—and how to stop it.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Super Earth High Command has ordered immediate deployment to what may represent a massive, untapped source of E-710: the Gloom. Consult the Galactic Map on your ship for more information.` },
   { n: 76, year:2025, date:`Feb 28, 2025`, name:`Operation Impending Gloom`, enemy:`Terminid`, result:`win`, note:`Against all odds, the Helldivers managed to repel the Automaton assault on both fronts. JULHEIM and DUMA TYR have been saved. Consult the Galactic Map on your ship for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Automatons have launched a brazen attack, underhandedly capitalizing on the ongoing Terminid and Illuminate offensives to further their despotic schemes. Intercepted communications indicate the enemy has two ultimate targets. But our Federation only has the resources to save one. Consult the Galactic Map on your ship for more information.` },
-  { n: 77, year:2025, date:`Jan 2025`, name:`Operation Keough Push`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 77, year:2025, date:`Jan 2025`, name:`Operation Keough Push`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Democracy Space Station has been returned to operational status, following a systemwide breakdown during the initial Illuminate invasion. 
+
+While the station was offline, Ministry of Defense engineers implemented a number of operational adjustments. Consult your Galactic Map for more information.
+
+The Illuminate have continued their assault on Freedom unabated. Utilize the ...` },
   { n: 78, year:2025, date:`Mar 30, 2025`, name:`Operation Shattered Skies`, enemy:`Automaton`, result:`win`, note:`After days of relentless fighting, the Helldivers have successfully protected Malevelon Creek. Their resounding victory has upheld the memory of those honored on Malevelon Creek Memorial Day. Malevelon Creek remains within the righteous embrace of Freedom—now, and forever.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Automatons, led by the Incineration Corps, have launched a grotesque surprise attack evidently targeting Malevelon Creek. All Helldivers are urgently called to defend and hold Malevelon Creek, and unleash Super Earth’s righteous Justice with the fullest permitted fury. Consult your Galactic Map for more details.` },
-  { n: 79, year:2025, date:`Feb 2025`, name:`Operation Ink & Thunder`, enemy:`Illuminate`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 80, year:2025, date:`Feb 2025`, name:`Operation Emperor's New Brood`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 81, year:2025, date:`Feb 2025`, name:`Operation Gloom Eternal`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 82, year:2025, date:`Feb 2025`, name:`Operation Good Samaritan`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 79, year:2025, date:`Feb 2025`, name:`Operation Ink & Thunder`, enemy:`Illuminate`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Illuminate appear to be attacking our worlds in order to gather Dark Energy, which seemingly powers the movement of the Meridian Singularity.
+
+The Singularity is currently approaching ANGEL'S VENTURE. The more Dark Energy the Illuminate are able to gather, the faster the Singularity moves. 
+
+All Helldivers are ordered to end any Illuminate invasion attempts as quickly as po...` },
+  { n: 80, year:2025, date:`Feb 2025`, name:`Operation Emperor's New Brood`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Terminids are surging at the Gloom border. FENRIR III is under attack.
+
+The Center of Science on this planet is of vital importance to stopping the Meridian Singularity. The Ministry of Science’s top astrophysicists are gathered there, researching both the Singularity itself and the Dark Energy that somehow powers its movement.
+
+All Helldivers are ordered to defend FENRIR III.
+...` },
+  { n: 81, year:2025, date:`Feb 2025`, name:`Operation Gloom Eternal`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Super Earth High Command has ordered immediate deployment to what may represent a massive, untapped source of E-710: the Gloom.
+
+Consult the Galactic Map on your ship for more information.` },
+  { n: 82, year:2025, date:`Feb 2025`, name:`Operation Good Samaritan`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Automatons have launched a brazen attack, underhandedly capitalizing on the ongoing Terminid and Illuminate offensives to further their despotic schemes. Intercepted communications indicate the enemy has two ultimate targets. But our Federation only has the resources to save one.
+
+Consult the Galactic Map on your ship for more information.` },
   { n: 83, year:2025, date:`Apr 7, 2025`, name:`Operation Twin Defender`, enemy:`Automaton`, result:`win`, note:`By returning WEZEN to the rightful control of Super Earth citizens, the Helldivers have secured the resources necessary to augment the Democracy Space Station with an Exosuit Support Bay. Moving forward, the DSS will provide rapid Exosuit replenishment to all Super Destroyers it shares an orbit with, reducing Exosuit Stratagem cooldown by 35% on the orbited planet.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Diligent engineers at the Deep Mantle Forge Complex on Claorell have developed potential improvements to the Democracy Space Station. The DSS was critical to the recent defense against the Automatons, and enhancing its capabilities has become a top priority. Consult your Galactic Map for more information.` },
   { n: 84, year:2025, date:`Apr 25, 2025`, name:`Operation Wild Hunt`, enemy:`Multi`, result:`loss`, note:`Dauntless efforts by the Helldivers fell short of mission targets. But the righteousness of our cause has yielded an unequivocal victory nevertheless. Center of Science projections confirm that the Meridian Wormhole will slow to a complete halt in short order. Furthermore, all Illuminate incursions have abruptly ended, and the enemy has disappeared. The victory of Managed Democracy is undeniable. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`On Pilen V, the Repulsive Gravity Field Generator nears completion. Once activated, it is projected to completely halt the Meridian Singularity’s movement. Interference from the Illuminate is expected to peak as activation nears.  The Helldivers are ordered to thin Illuminate forces and defend vital planets. Further, the Helldivers are ordered to gather E-710 by containing the Predator Strain outbreak on Turing.` },
   { n: 85, year:2025, date:`Apr 29, 2025`, name:`Operation Black Hole Sun`, enemy:`Terminid`, result:`win`, note:`The rapid and tireless actions of the Helldivers limited the territory lost to the opportunistic offensives of the Terminids and Automatons. A number of key strategic sites have been lost to the dishonorable tactics of our enemies. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Meridian Singularity has come to a halt. However, though one enemy is all but annihilated, the Terminids and Automatons remain significant threats. In the Illuminate's final hours, they dealt significant damage to the defenses of multiple strategic sites across both battlefronts, granting the opportunity for our foes to capture formerly well-defended territory. The Helldivers must hold these sites.` },
-  { n: 86, year:2025, date:`Mar 2025`, name:`Operation Tormenta de Fuego`, enemy:`Multi`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 87, year:2025, date:`Mar 2025`, name:`Operation Racing Penrose`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 88, year:2025, date:`Mar 2025`, name:`Operation Apocalypse Cancelled`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 89, year:2025, date:`Mar 2025`, name:`Operation Martyr's Calling`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 86, year:2025, date:`Mar 2025`, name:`Operation Tormenta de Fuego`, enemy:`Multi`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Meridian Singularity continues its relentless advance through our Federation. Moradesh may soon be the next celestial victim of the Illuminate's tyrannical avarice.
+
+Simultaneously, the Automatons have launched a surprise attack on Claorell, seeking to take control of the Deep Mantle Forge Complex.
+
+The Helldivers must choose where to defend. Consult your Galactic Map for m...` },
+  { n: 87, year:2025, date:`Mar 2025`, name:`Operation Racing Penrose`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Center of Science has unveiled a multi-stage plan to counteract the movement of the Singularity.
+
+High Command has ordered the construction of the Penrose Energy Siphon: a means by which to effect a large one-time reduction in Dark Energy Accumulation.
+
+The device will be constructed piecewise in the orbit of several planets. The Helldivers must hold each of these planets u...` },
+  { n: 88, year:2025, date:`Mar 2025`, name:`Operation Apocalypse Cancelled`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The efforts of the Helldivers to impede the Meridian Singularity have made it possible to save the planets that remain in its destructive path.
+
+The Helldivers are ordered to suppress Illuminate invasion events. If successful, this will free Super Earth from the Singularity's path of destruction.
+
+High Command has authorized the temporary deployment of a new Stratagem for use a...` },
+  { n: 89, year:2025, date:`Mar 2025`, name:`Operation Martyr's Calling`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Automatons, led by the Incineration Corps, have launched a grotesque surprise attack evidently targeting Malevelon Creek.
+
+All Helldivers are urgently called to defend and hold Malevelon Creek, and unleash Super Earth’s righteous Justice with the fullest permitted fury.
+
+Consult your Galactic Map for more details.` },
   { n: 90, year:2025, date:`May 6, 2025`, name:`Operation Crew Downtime Adjustment`, enemy:`Automaton`, result:`win`, note:`Through the unwittingly synchronized deployment of elite units, enemies of Freedom have unlawfully seized more planets than the Helldivers could liberate. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The resurgence of the Automaton Jet Brigade and Incineration Corps, along with the virulent Terminid Predator Strain,  threaten our citizens and enable our enemies' rampant expansionistic ambitions. These territorial landgrabs must be decisively repulsed. The Helldivers are ordered to liberate at least one more planet than is lost during the duration of the order.` },
-  { n: 91, year:2025, date:`May 20, 2025`, name:`Operation Niflheim`, enemy:`Terminid`, result:`win`, note:`As anticipated, Widow's Harbor, Pilen V, and New Haven have fallen to the Illuminate. The dauntless and obedient resistance of the Helldivers reduced the enemy's estimated fleet strength by 21.5%, a powerful blow to the enemy's invasion strength.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 91, year:2025, date:`May 20, 2025`, name:`Operation Niflheim`, enemy:`Terminid`, result:`win`, note:`As anticipated, Widow's Harbor, Pilen V, and New Haven have fallen to the Illuminate. The dauntless and obedient resistance of the Helldivers reduced the enemy's estimated fleet strength by 21.5%, a powerful blow to the enemy's invasion strength.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The resurgence of the Automaton Jet Brigade and Incineration Corps, along with the virulent Terminid Predator Strain,  threaten our citizens and enable our enemies' rampant expansionistic ambitions. These territorial landgrabs must be decisively repulsed.
+
+The Helldivers are ordered to liberate at least one more planet than is lost during the duration of the order.` },
   { n: 92, year:2025, date:`May 20, 2025`, name:`Operation Vermintide`, enemy:`Terminid`, result:`win`, note:`The Helldivers, fighting side-by-side with regular SEAF soldiers, have caused significant losses to the Illuminate ground and airborne detachments. Projections indicate that clearing the targeted benchmark has resulted in a 10% hit to the Illuminate Fleet Strength, in addition to their losses from attrition.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Battle for Super Earth has begun. The battle will span multiple Orders. Hold the Mega Cities: if all 7 fall, Super Earth is lost. The strategic focus for the initial wave of battle is to kill as many Illuminate ground forces as possible.` },
   { n: 93, year:2025, date:`May 23, 2025`, name:`Operation Sushi Bar`, enemy:`Illuminate`, result:`win`, note:`The Illuminate have retreated. The Battle for Super Earth has been won. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The initial wave of assault is over. The Battle for Super Earth now enters its critical next phase. Illuminate Fleet Strength currently stands at 49%. 6 Mega Cities remain standing. They must be defended at all costs. The Helldivers are ordered to execute a sustained campaign of successful operations on Super Earth.` },
-  { n: 94, year:2025, date:`Apr 2025`, name:`Operation Omens Undone`, enemy:`Multi`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n: 95, year:2025, date:`Apr 2025`, name:`Operation Damage Control`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n: 94, year:2025, date:`Apr 2025`, name:`Operation Omens Undone`, enemy:`Multi`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Multiple Gloom-adjacent planets have come under sudden onslaught by mutated Terminids. The Helldivers are called to their immediate defense. The enemy combatants match descriptions and attack patterns of the Predator Strain.
+
+Consult your Galactic Map for more information.` },
+  { n: 95, year:2025, date:`Apr 2025`, name:`Operation Damage Control`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Illuminate have launched multiple simultaneous attacks, targeting our efforts to stop the Meridian Singularity. Consult your Galactic Map for more information.` },
   { n: 96, year:2025, date:`Jun 10, 2025`, name:`Operation Equilibrium`, enemy:`Multi`, result:`loss`, note:`The Helldivers have successfully repelled the Terminid assault, securing all five designated urban centers. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Massive Terminid outbreaks have erupted simultaneously across multiple Super Earth cities. This unprecedented assault of Fascism into highly-populated areas puts millions of citizens in grave danger. The Helldivers must respond immediately. Illuminate pursuit operations must be temporarily suspended. Repel the Terminid invasion from our cities.` },
   { n: 97, year:2025, date:`Jun 17, 2025`, name:`Operation Party Crasher`, enemy:`Illuminate`, result:`win`, note:`The Helldivers' tenacious attempt to reclaim our corrupted cities has failed. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Super Earth Satellite Observation Network has regained operability, revealing that Illuminate fugitives have twisted multiple Federation cities into totalitarian strongholds. Helldivers: reclaim these cities for Super Earth. Consult your Galactic Map for more information.` },
   { n: 98, year:2025, date:`Jun 22, 2025`, name:`Operation Defenders of Our Freedom`, enemy:`Illuminate`, result:`win`, note:`The Helldivers have successfully collected the mandated war restitution. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Pursuant to intergalactic law, substantial war reparations are now owed by the Illuminate for their assault on Super Earth, with a tribunal ruling the Terminids as bearing secondary liability. Helldivers: execute Illuminate fugitives and cull Terminid abettors, to deliver technology, materiel, E-710, and Justice commensurate with the reparations owed. Consult your Galactic Map for more information.` },
   { n: 99, year:2025, date:`Jun 26, 2025`, name:`Operation Rampart`, enemy:`Illuminate`, result:`loss`, note:`The latest Automaton offensive—led by the newly-augmented Jet Brigade—has been decisively repelled by the Helldivers. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`ALERT: A large-scale, coordinated Automaton offensive has launched without warning. The Helldivers are to deploy to all systems under attack, and defend all affected planets. Consult your Galactic Map for more information.` },
-  { n:100, year:2025, date:`May 2025`, name:`Operation Reforged Station`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:101, year:2025, date:`May 2025`, name:`Operation System Update`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:102, year:2025, date:`May 2025`, name:`Operation Do or Die`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:103, year:2025, date:`May 2025`, name:`Operation Steel Quarry`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:100, year:2025, date:`May 2025`, name:`Operation Reforged Station`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The first scattered dregs of the cowardly Illuminate invasion force have been located, and traced to several outlying systems.
+
+The Helldivers are ordered to liberate all identified hideouts. Intel believes there are more Illuminate planets yet to be identified. The liberation of these sites could lead to the others.` },
+  { n:101, year:2025, date:`May 2025`, name:`Operation System Update`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Massive Terminid outbreaks have erupted simultaneously across multiple Super Earth cities. This unprecedented assault of Fascism into highly-populated areas puts millions of citizens in grave danger.
+
+The Helldivers must respond immediately. Illuminate pursuit operations must be temporarily suspended. Repel the Terminid invasion from our cities.` },
+  { n:102, year:2025, date:`May 2025`, name:`Operation Do or Die`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Super Earth Satellite Observation Network has regained operability, revealing that Illuminate fugitives have twisted multiple Federation cities into totalitarian strongholds.
+
+Helldivers: reclaim these cities for Super Earth. Consult your Galactic Map for more information.` },
+  { n:103, year:2025, date:`May 2025`, name:`Operation Steel Quarry`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+ALERT: A large-scale, coordinated Automaton offensive has launched without warning. The Helldivers are to deploy to all systems under attack, and defend all affected planets. Consult your Galactic Map for more information.` },
   { n:104, year:2025, date:`Jul 8, 2025`, name:`Operation Deep Cleaning`, enemy:`Illuminate`, result:`loss`, note:`The first of many steps toward healing our noble capital planet, and the broken hearts of all citizens, is complete. The Helldivers have triumphed, and have secured the foundation upon which the great city of Remembrance will be reborn.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Remembrance—destroyed during the completely failed Illuminate invasion of Super Earth—will be the first of our fallen Mega Cities to be rebuilt, as selected by the Ministry of Prosperity. To reclaim worlds threatened by hostile forces, and seize necessary rebuilding assets, the Helldivers must hold all designated planets, and complete the required number of operations.` },
   { n:105, year:2025, date:`Jul 22, 2025`, name:`Operation Pest Control`, enemy:`Terminid`, result:`win`, note:`The Helldivers have successfully exterminated 5,000,000 Spore Burst Warriors on FORI PRIME through effective employment of the Stalwart. A spike in citizen donations to the War Fund has made possible the short-term addition of the Orbital Railcannon Strike Stratagem to all Helldiver arsenals for the remainder of the current order.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`A public relations campaign is being launched to remind our citizens that they are protected by the Galaxy's greatest fighting force. The Helldivers are ordered to kill the enemies of Freedom that arise most frequently in citizen nightmares. Consult your Galactic Map for more information.` },
-  { n:106, year:2025, date:`Jul 29, 2025`, name:`Operation Squid Eviction`, enemy:`Illuminate`, result:`loss`, note:`Vigorous, spirited efforts by the Helldivers to generate patriotic war footage for our citizens has had the desired effect. Their acts of valor are now being broadcast to all workplace and home televisions, showcasing the inspiring and visceral destruction of our enemies inflicted by the Helldivers every day. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:106, year:2025, date:`Jul 29, 2025`, name:`Operation Squid Eviction`, enemy:`Illuminate`, result:`loss`, note:`Vigorous, spirited efforts by the Helldivers to generate patriotic war footage for our citizens has had the desired effect. Their acts of valor are now being broadcast to all workplace and home televisions, showcasing the inspiring and visceral destruction of our enemies inflicted by the Helldivers every day. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+A public relations campaign is being launched to remind our citizens that they are protected by the Galaxy's greatest fighting force. The Helldivers are ordered to kill the enemies of Freedom that arise most frequently in citizen nightmares.
+
+Consult your Galactic Map for more information.` },
   { n:107, year:2025, date:`Jul 30, 2025`, name:`Operation Debt Collector`, enemy:`Multi`, result:`win`, note:`Thanks to the security and Terminid tissue provided by the Helldivers, the Center of Science has successfully designed a process by which to mass-produce Gloom-resistent polymer coating. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`New Alcubiere Drive shielding technology could lead to a new era of Gloom exploration. Meanwhile, Spore Burst Terminids originating from FORI PRIME have spread outside the Gloom, a first for this strain. The Helldivers are ordered to collect 30,000,000 Rare Terminid Samples, particularly those in the Jin Xi sectors. Additionally, they must hold Turing and Achernar Secundus, protecting our brilliant scientists and their vital engineers.` },
-  { n:108, year:2025, date:`Jun 2025`, name:`Operation Jet Crusade`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:108, year:2025, date:`Jun 2025`, name:`Operation Jet Crusade`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Distress calls have been raised from multiple planets. Automaton invasion ships have landed, disrupting ongoing merriment and sanctioned frivolity in the wake of our great victory. The Helldivers must respond immediately to this barbaric assault.` },
   { n:109, year:2025, date:`Aug 13, 2025`, name:`Operation Pillar of Dawn`, enemy:`Terminid`, result:`win`, note:`CRIMSICA has been liberated from the Terminids. Construction on a new and much more secure E-710 farm has already begun, along with a fleet of new Super Destroyers. Once complete, this fleet expansion will mean that more Helldivers can spread Managed Democracy simultaneously. The strongest fighting force in the Galaxy will soon be even stronger.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Helldivers are ordered to liberate CRIMSICA in order to enable the establishment of a new E-710 farm there. Consult your Galactic Map for more information.` },
-  { n:110, year:2025, date:`Aug 17, 2025`, name:`Operation Ashes of Remembrance`, enemy:`Terminid`, result:`win`, note:`TYRANNY PARK 2 EXPANSION SECURED Helldivers have successfully neutralized all designated Gloom-mutated Terminids. A surge of Tyranny Park 2 ticket pre-sales has followed the announcement of "The Forbidden Gloom" expansion zone. As such, Tyranny Park 2 has sponsored the Orbital Napalm Barrage stratagem to be available fleetwide for the next 48 hours.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:111, year:2025, date:`Aug 19, 2025`, name:`Operation Drydock Lockout`, enemy:`Automaton`, result:`loss`, note:`Thanks to the peerless valor of the Helldivers, and their steadfast dedication to top-tier edutainment, the promise and prosperity of Tyranny Park 2 can now be realized.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:112, year:2025, date:`Jul 2025`, name:`Operation Culling Nightmares`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:113, year:2025, date:`Jul 2025`, name:`Operation Gloom Piercer`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:110, year:2025, date:`Aug 17, 2025`, name:`Operation Ashes of Remembrance`, enemy:`Terminid`, result:`win`, note:`TYRANNY PARK 2 EXPANSION SECURED Helldivers have successfully neutralized all designated Gloom-mutated Terminids. A surge of Tyranny Park 2 ticket pre-sales has followed the announcement of "The Forbidden Gloom" expansion zone. As such, Tyranny Park 2 has sponsored the Orbital Napalm Barrage stratagem to be available fleetwide for the next 48 hours.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Super Earth Government has authorized the construction of Tyranny Park 2, a massive recreational and education facility showcasing the most dire threats posed to Managed Democracy. Helldiver aid is needed for this important endeavor. Consult your Galactic Map for more information.` },
+  { n:111, year:2025, date:`Aug 19, 2025`, name:`Operation Drydock Lockout`, enemy:`Automaton`, result:`loss`, note:`Thanks to the peerless valor of the Helldivers, and their steadfast dedication to top-tier edutainment, the promise and prosperity of Tyranny Park 2 can now be realized.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Illuminate have launched a massive offensive—the third concurrent onslaught upon our besieged Federation. We are losing ground.
+
+Reinforcements are en route. But the new Super Destroyer fleet is still 96 hours from mobilization. They will be too late unless you buy time.
+
+Helldivers: Collapse the Illuminate advance by eliminating 1,000,000,000 of their forces. You must hold...` },
+  { n:112, year:2025, date:`Jul 2025`, name:`Operation Culling Nightmares`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Multiple simultaneous Automaton assaults have been detected on planets with highly-populated Super Earth cities. MININT analysis reports with a high degree of confidence that the strategic objective of this invasion is to take control of key Democracy Space Station facilities.
+
+Hold the key DSS facilities at all costs.` },
+  { n:113, year:2025, date:`Jul 2025`, name:`Operation Gloom Piercer`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+High Command has authorized construction of a new, state-of-the-art Helldiver training facility on ZEGEMA PARADISE. 
+
+To support the creation of this facility, Helldivers are ordered to liberate the specified Terminid planets to enable follow-on acquisition of live specimens by SEAF units, and to secure 50,000,000 Terminid Samples to sustain breeding efforts for future training.` },
   { n:114, year:2025, date:`Sep 1, 2025`, name:`Operation Trooper Deatomization`, enemy:`Automaton`, result:`win`, note:`The Helldivers have liberated HELLMIRE from the Gloom’s clutches. Their superhuman efforts have successfully enabled construction of a forward operating base inside the Gloom, dubbed Outpost Alpha. As long as Outpost Alpha remains operational, the Helldivers will have unprecedented access to the heart of the Gloom. Outpost personnel have completed initial geological scans of OSHAUNE. The planet presents a unique biome, which has earned it the designation: Hive World.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Helldivers are ordered to once again brave the mutative darkness of the Gloom, and establish a forward operating base within its perimeter. From there, they will be able to conduct operations deep into the Mirin sector, an area believed by Xenoentomologists to contain at least one prominent Gloom source.` },
   { n:115, year:2025, date:`Sep 11, 2025`, name:`Operation Lost World`, enemy:`Terminid`, result:`win`, note:`The outpouring of Terminids from the Gloom appears to have subsided. The damage has been severe, but thanks to the swift intervention of the Helldivers, the worst has been prevented. Consult your Galactic Map for more details.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`GACRUX has become infested by the Terminids, and the planet's system is now infused with low levels of Gloom spores. Left uncleansed, it is believed the Gloom will grow in density. Swift action is critical; the planet must be re-liberated before the Gloom can grow. The more intense the Gloom becomes, the more difficult liberation of the planet will become.` },
   { n:116, year:2025, date:`Sep 18, 2025`, name:`Operation Ultrakill`, enemy:`Terminid`, result:`win`, note:`The Helldivers have seized the Automatons’ ill-gotten habitat tech, while holding HELLMIRE against the unrelenting onslaught of Terminid marauders. The seized technologies are already being put to use expanding and strengthening Outpost Alpha. When expanded, Gloom Base Alpha will provide much-needed logistical support in the area. It is set to combat adverse effects of the Gloom and help liberation efforts on the nearby Hive World.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The jolly workhands of our weapons manufacturers are eager to help strike back at the Gloom. However, no currently available materiel can be spared to facilitate their proposed increase in productivity. Valyria 5 is home to the original Emancipator Exosuit factory. Underground storage bunkers on the planet may still contain Exosuit parts. The surface of Choepessa IV remains bestrewn with exploded and unexploded ordnance from the first Galactic War, which could be repurposed into Orbital munitions. The Helldivers are ordered to liberate one of these two planets, in order to secure materials for our indefatigable working heroes’ extracurricular initiative.` },
-  { n:117, year:2025, date:`Aug 2025`, name:`Operation update: Automaton Offensive`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:118, year:2025, date:`Aug 2025`, name:`Operation update: Illuminate Invasion`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:119, year:2025, date:`Aug 2025`, name:`Operation Righteous Reclamation`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:117, year:2025, date:`Aug 2025`, name:`Operation update: Automaton Offensive`, enemy:`Automaton`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER 
+
+The Helldivers are ordered to clear the Nanos Sector to secure New Aspiration City. 
+
+Additionally, in order to prove to the Automatons—and the Federation—that their brutish scare tactics are ineffective, the Helldivers are ordered to destroy the designated number of Automaton Conscripts with the Railcannon Stratagem.` },
+  { n:118, year:2025, date:`Aug 2025`, name:`Operation update: Illuminate Invasion`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+All units to high alert. Multiple large-scale Terminid incursions have been reported on planets surrounding the Gloom. ACHERNAR SECUNDUS, ERATA PRIME, FENRIR III, AND TURING are under attack. The Helldivers must deploy immediately to their defense.
+
+The Helldivers are ordered to Kill 6,000,000,000 Terminids. It is believed the attack will continue without abatement until then.` },
+  { n:119, year:2025, date:`Aug 2025`, name:`Operation Righteous Reclamation`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Helldivers are ordered to once again brave the mutative darkness of the Gloom, and establish a forward operating base within its perimeter.
+
+From there, they will be able to conduct operations deep into the Mirin sector, an area believed by Xenoentomologists to contain at least one prominent Gloom source.` },
   { n:120, year:2025, date:`Oct 21, 2025`, name:`Operation Rock And Stone`, enemy:`Terminid`, result:`loss`, note:`The Helldivers have liberated Erata Prime and Estanu, establishing a security buffer around Hellmire. Now, the strategic conditions to liberate Oshaune are finally set. With great valor and sacrifice, the Terminid Hive World will at last be freed.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Following weeks of preparation, SEAF forces stand at the brink of liberating the Terminid Hive World, Oshaune. The offensive will launch from Gloom Base Alpha on Hellmire. The Helldivers are ordered to prepare for the impending offensive by liberating ERATA PRIME and ESTANU to better protect Hellmire from Terminid attacks upon it.` },
   { n:121, year:2025, date:`Oct 28, 2025`, name:`Operation Gloom Tide`, enemy:`Terminid`, result:`win`, note:`A great victory has been won. Through fortitude and ingenuity, the haze of the Gloom has been pierced. The first great hurdle towards dispersing its maleficence has been cleared. Hive World OSHAUNE has been liberated. Consult your Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The time has come to liberate the Hive World. All Helldivers are ordered to deploy to OSHAUNE. Do not relent until it is purged.` },
-  { n:122, year:2025, date:`Sep 2025`, name:`Operation Capitalized Industry`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:123, year:2025, date:`Sep 2025`, name:`Operation Calamari Damacy`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:122, year:2025, date:`Sep 2025`, name:`Operation Capitalized Industry`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+In order to seize the Hive World once and for all, High Command is fast-tracking a number of improvements and augmentations to the Democracy Space Station.
+
+KARLIA has the ideal gravitational and atmospheric conditions for these augmentations to be safely applied. However, any attacks on the DSS during augmentation would be disastrous.
+
+The Helldivers are ordered to seize KARLI...` },
+  { n:123, year:2025, date:`Sep 2025`, name:`Operation Calamari Damacy`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Multiple Gloom-adjacent planets have come under heavy Terminid attack. There are worrying signs the Gloom itself may be expanding, for the first time since the end of its initial expansion. 
+
+The Helldivers are called to the immediate defense of all besieged planets. Be advised: there are unverified reports of mutated Terminid strains, previously confined to the Gloom, on the b...` },
   { n:124, year:2025, date:`Nov 8, 2025`, name:`Operation Split Synapse`, enemy:`Automaton`, result:`win`, note:`BARABOS has been liberated. Ministry of Prosperity conservationists are hard at work uprooting cultivars and plant material to re-seed one Super Earth's destroyed rainforests. Soon, Super Earth's natural beauty will be restored, thanks to the ecological protection efforts of the Helldivers.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The last remaining rainforests on Super Earth were a tragic casualty of the Illuminate invasion. The Ministry of Prosperity has launched a restoration operation, to preserve and conserve the natural beauty of the galaxy. The native flora of BARABOS is similar to those of the lost rainforests. The Helldivers are ordered to liberate BARABOS from the enemy, so its plant life can be carefully uprooted and re-planted on Super Earth.` },
-  { n:125, year:2025, date:`Nov 20, 2025`, name:`Operation This Belongs In A Museum`, enemy:`Multi`, result:`win`, note:`The Helldivers have secured the resources needed to expand the Center for Citizen Surveillance & Safety, far beyond its walls. Consult the Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:125, year:2025, date:`Nov 20, 2025`, name:`Operation This Belongs In A Museum`, enemy:`Multi`, result:`win`, note:`The Helldivers have secured the resources needed to expand the Center for Citizen Surveillance & Safety, far beyond its walls. Consult the Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Center for Citizen Surveillance & Safety has released a disturbing report: several domestic planets are rife with dissident activity.
+
+It is critical to expand the Center as soon as possible. The Helldivers are ordered to secure 15,000,000 Illuminate samples and 62,500,000 Automaton samples, which will be used to aid development of surveillance technology.
+
+Consult your Gal...` },
   { n:126, year:2025, date:`Nov 20, 2025`, name:`Operation Reclaimed Fire`, enemy:`Automaton`, result:`win`, note:`The enemy has gained ground on multiple fronts. Forces have been pulled back in retreat as all 3 factions push forward. Fierce, stalwart Helldiver resistance forestalled catastrophe, but the losses are nevertheless significant. Consult the Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Incursions have been detected on all three fronts. The Helldivers are called to their immediate defense. SEAF defensive garrisons are stretched thin by efforts to quell the dissident crisis on GAELLIVARE, ALTA V, and DILUVIA. The enemy is taking advantage of the vulnerabilities this created in our lines. Consult the Galactic Map for more information.` },
-  { n:127, year:2025, date:`Oct 2025`, name:`Operation Heatshield`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:128, year:2025, date:`Oct 2025`, name:`Operation Liberty Day 2185`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:129, year:2025, date:`Oct 2025`, name:`Operation Relentless Uproot`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:127, year:2025, date:`Oct 2025`, name:`Operation Heatshield`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Keys to unlock critical Automaton data are located on MENKENT and AESIR PASS. The encryption key on MENKENT would unlock intel regarding Vessel 00; the cache on AESIR PASS would unlock intel regarding the Nucleus.
+
+The Automatons will purge all data from one site as soon as the other is compromised. Only one encryption key can be recovered.
+
+The Helldivers must choose whether t...` },
+  { n:128, year:2025, date:`Oct 2025`, name:`Operation Liberty Day 2185`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Preparations for Liberty Day have begun in earnest. To further bolster morale this Liberty Day, all Helldivers are tasked with aiding in the procurement of explosives for the Super Earth Patriotic Pyrotechny Display.
+
+The Automatons are known to possess high amounts of statute-violating explosives. The Helldivers are ordered to seize their stockpiles, and save Super Earth for f...` },
+  { n:129, year:2025, date:`Oct 2025`, name:`Operation Relentless Uproot`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Following weeks of preparation, SEAF forces stand at the brink of liberating the Terminid Hive World, Oshaune. 
+
+The offensive will launch from Gloom Base Alpha on Hellmire. The Helldivers are ordered to prepare for the impending offensive by liberating ERATA PRIME and ESTANU to better protect Hellmire from Terminid attacks upon it.` },
   { n:130, year:2025, date:`Dec 2, 2025`, name:`Operation: Bigger Apple`, enemy:`Illuminate`, result:`win`, note:`The first battle in the War on Dissidence has ended in a decisive victory, thanks to the Helldivers. Ground has been broken on the Center for the Confinement of Dissidence (CECOD). Once built, CECOD will hold up to 15 million dissidents, enabling thorough and secure re-education. Consult the Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Extremely-high-confidence intel indicates the presence of dissidents hiding from justice in the jungles of Terminid-infested PHERKAD SECUNDUS. The Helldivers are ordered to liberate PHERKAD SECUNDUS, to flush out the hidden dissidents and enable their apprehension.` },
   { n:131, year:2025, date:`Dec 18, 2025`, name:`Operation Big Brother`, enemy:`Multi`, result:`win`, note:`Construction of Pandora Base has begun. High Command has declassified the ultimate objective of Operation Free Space: the Star of Peace. This glorious upgrade will augment the Democracy Space Station into a beacon capable of projecting Liberty’s light across entire planetary systems. Consult the Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`A portion of this year’s Reckoning Fund has been allocated for Experimental Stratagem Testing. Three enemy-held planets have been specially chosen for weapons testing: MARFARK, NEW STOCKHOLM, and HEETH. On these planets, the ORBITAL 120MM HE BARRAGE has been experimentally modified to the Orbital 120MM HE/EMS Barrage. The Helldivers are ordered to reach the targeted kill count on any one of the chosen planets.` },
-  { n:132, year:2025, date:`Dec 21, 2025`, name:`Operation Tide of Tyranny`, enemy:`Multi`, result:`loss`, note:`The Helldivers have supported the advancement of science and the entertainment of citizens young and old, killing 400,000,000 of the enemy on HEETH. Fun and merriment was had by all viewing the joyous dismemberment and electrocution of Freedom’s enemies, delivered by the experimental Orbital 120MM HE/EMS Barrage.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:132, year:2025, date:`Dec 21, 2025`, name:`Operation Tide of Tyranny`, enemy:`Multi`, result:`loss`, note:`The Helldivers have supported the advancement of science and the entertainment of citizens young and old, killing 400,000,000 of the enemy on HEETH. Fun and merriment was had by all viewing the joyous dismemberment and electrocution of Freedom’s enemies, delivered by the experimental Orbital 120MM HE/EMS Barrage.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Incursions have been detected on all three fronts. The Helldivers are called to their immediate defense.
+
+SEAF defensive garrisons are stretched thin by efforts to quell the dissident crisis on GAELLIVARE, ALTA V, and DILUVIA. The enemy is taking advantage of the vulnerabilities this created in our lines.
+
+Consult the Galactic Map for more information.` },
   { n:133, year:2025, date:`Dec 23, 2025`, name:`War on Dissidence`, enemy:`Illuminate`, result:`win`, note:`Citizens across the Federation celebrate the righteous, joyous deliverance of Justice to our enemies, watching as the Helldivers have reached the targeted kill count on MARFARK. The holiday spirit can be seen and felt across the Galaxy, not least in the record-breaking sales of commercial goods.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`As the Festival of Reckoning moves into its second phase, with the official theme of “Gratitude,” our citizens gather to list the gifts of the Federation: Freedom. Managed Choices. Security. It is with this spirit of Gratitude that High Command authorizes the second modified Stratagem for Experimental Testing: the Incendiary Gatling Barrage, available on HEETH, MARFARK, and NEW STOCKHOLM. As before, the Helldivers are encouraged to celebrate the ongoing Festival with unprejudiced enthusiasm, by reaching the targeted kill count on any of the chosen planets.` },
-  { n:134, year:2025, date:`Dec 2025`, name:`Operation Magma Charter`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:135, year:2025, date:`Dec 2025`, name:`Operation Kalium`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:136, year:2025, date:`Dec 2025`, name:`Festival of Reckoning 2185 - Operation Last Minute Presents`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:134, year:2025, date:`Dec 2025`, name:`Operation Magma Charter`, enemy:`Automaton`, result:`loss`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Helldiver operations have led to the discovery of Automaton operations on multiple Magma planets, previously outside of operational surveillance. These planets have been added to the Galactic Map.
+
+The Helldivers are ordered to deploy to these planets immediately. FURY, K, and MOX are the initial targets. Seize the Automaton industrial facilities so they may be turned towards D...` },
+  { n:135, year:2025, date:`Dec 2025`, name:`Operation Kalium`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+High Command has initiated Operation Free Space by ordering construction of Pandora Base on Afoyay Bay. This top-secret foundry will develop next-generation Galactic defense technologies central to Operation Free Space. 
+
+Hold Afoyay Bay to secure the endeavor and its workforce, supplied by the Center for the Confinement of Dissidence, and liberate and hold Magma Planets, to st...` },
+  { n:136, year:2025, date:`Dec 2025`, name:`Festival of Reckoning 2185 - Operation Last Minute Presents`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+The Government of Super Earth has declared a new war: The War on Dissidence. SEAF units have been deployed in force to cities across the Federation. Our enemies are expected to attempt to exploit this vulnerability; the Helldivers must hold the line.
+
+Additionally, High Command has ordered the construction of the Center for the Containment of Dissidence on AFOYAY BAY. The Helld...` },
   { n:137, year:2026, date:`Jan 2, 2026`, name:`Operation Free Space`, enemy:`Terminid`, result:`loss`, note:`The Terminid Hive World of Omicron has proven extremely infested, frustrating efforts to extract E-711 from the planet. While some E-711 was secured, synthesizing it into Dark Fluid remains a highly inefficient process. Currently, projected yields are insufficient to enable the Star of Peace to fire. Consult the Galactic Map for more details.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Operation Free Space proceeds on schedule. Its centerpiece is the creation of the Star of Peace, an augmentation to the Democracy Space Station. The primary weapon of the Star of Peace is a cutting-edge beam of ionized Dark Fluid. Synthesizing sufficient Dark Fluid to fire the Star of Peace even once will require vast amounts of E-711. The Helldivers are ordered to enable high-risk E-711 extraction on the mostly-untouched Hive World of Omicron.` },
-  { n:138, year:2026, date:`Jan 14, 2026`, name:`Operation Iridium Rush`, enemy:`Automaton`, result:`win`, note:`The Helldivers have secured the Magma Planets. Internal components harvested from sufficiently-intact Automatons have equipped the Star of Peace  with the thermal shielding it required. The Star of Peace nears operational readiness, and will deliver Operation Free Space imminently. Consult the Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:138, year:2026, date:`Jan 14, 2026`, name:`Operation Iridium Rush`, enemy:`Automaton`, result:`win`, note:`The Helldivers have secured the Magma Planets. Internal components harvested from sufficiently-intact Automatons have equipped the Star of Peace  with the thermal shielding it required. The Star of Peace nears operational readiness, and will deliver Operation Free Space imminently. Consult the Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER 
+
+The Star of Peace requires thermal shielding to withstand firing its high-yield beam, optimized for mass Freedom dispensation.
+
+Helldivers: hold the Magma Planets to secure the mining infrastructure from Automaton greed, and to enable harvesting of their internal iridium-infused heatsinks.` },
   { n:139, year:2026, date:`Jan 14, 2026`, name:`Operation Celestial Power`, enemy:`Multi`, result:`win`, note:`Operation Free Space has been successfully completed. In a triumph of Managed Democracy, the Star of Peace has fired upon PENTA, collapsing it into a black hole and destroying all enemy forces present. The firing of this experimental defensive weapon was a monumental success. However, the DSS sustained damage during the firing process, and must be taken offline for repairs for a short period of time.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The DSS will soon be augmented with the Star of Peace, a defensive weapon capable of collapsing entire planets. The Helldivers will vote on which planet to target, beginning in 48 hours. They must ensure the selected planet is adjacent to a planet under Super Earth control at the time of firing. There are three potential targets, one per faction: Penta, Valmox, and Zagon Prime.` },
   { n:140, year:2026, date:`Jan 21, 2026`, name:`Operation Breached Silence`, enemy:`Illuminate`, result:`win`, note:`The Illuminate have been repelled from Afoyay Bay long enough to evacuate the majority of CECOD and Pandora Base personnel to a secure location. The DSS has been moved to #planet1, where it is secure from enemy attack. The Ministry of Truth investigation has confirmed an unauthorized download of the full blueprints to the Star of Peace. However, no facility personnel were involved: this was an act of espionage by an external foe. Consult the Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Disturbing evidence has come to light: the Star of Peace may have experienced a data breach at or near the time of firing. The station has been placed into lockdown. Exacerbating the situation, intel indicates an imminent Illuminate attack on Afoyay Bay, seeking to destroy the Star of Peace. the Helldivers are ordered to clear a path through VALMOX and MYRIUM, while holding Afoyay Bay, to enable the evacuation of Pandora Base and CECOD personnel.` },
   { n:141, year:2026, date:`Jan 27, 2026`, name:`Operation Information Reclamation`, enemy:`Multi`, result:`loss`, note:`Though the investigation was blocked, in a fortuitous turn of impeccably accurate patriotic intuition, the stolen Star of Peace blueprints have been located precisely where expected. The only viable conclusion: the Automatons intend to build their own socialist Star of Peace, to wield for terror. High Command has no choice but to prosecute the perpetrators of this despicable and Galaxy-threatening act. Cyberstan must be destroyed.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`To identify the culprit behind the Star of Peace blueprint espionage, simultaneous searches of Automaton and Illuminate data storage nodes will be conducted. Helldivers: hold CLASA, YED PRIOR, MOG, and ADHARA to allow recovery teams to perform deep-system archival synchronization. Democracy demands simple, uncomplex truth. The Helldivers will now secure it.` },
   { n:142, year:2026, date:`Mar 13, 2026`, name:`Operation Valid Pretext (Phase 1: The March to Cyberstan)`, enemy:`Automaton`, result:`win`, note:`Charbal VII has been liberated. The Utopia Varen Megafactory and its bio-furnaces have been decisively dismantled. With massive quantities of components and dormant organic tissue pre-emptively liquidated, the required kill count for the current Major Order has been officially reduced by 25,000,000.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Intel has identified the Utopia Varen Megafactory on Charbal VII as a primary Cyborg Production Unit hub. Massive quantities of components and organic tissue currently lie dormant within its bio-furnaces, awaiting cybernetic activation and augmentation. Liberating the planet will allow the pre-emptive decommissioning of these unregistered units. Succeed, and the required kill count for the current Major Order will be reduced by 25,000,000.` },
   { n:143, year:2026, date:`Mar 21, 2026`, name:`Operation Valid Pretext (Phase 2: Landfall)`, enemy:`Automaton`, result:`win`, note:`The Helldivers interceded on SEASSE, successfully nullifying this latest Illuminate scheme. However, the planet remains in the inhuman, tentacled grasp of the xenophobic enemy. The Exospires they have raised are generating a growing Exostorm that will soon cover the entire planet. Consult the Galactic Map for more information.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Cyborg invasion forces have landed on the surface of ZEFIA. They seek to expand their empire and mar their surface with new Megafactories. The Cyborg threat cannot be allowed to grow unchecked.` },
   { n:144, year:2026, date:`Mar 27, 2026`, name:`Operation Valid Pretext (Phase 3: Ground Invasion)`, enemy:`Automaton`, result:`loss`, note:`The Helldivers have liberated Ursica XI and, in doing so, swiftly gathered an immense volume of combat telemetry, to catalyze R&D teams at AM Defense. By analyzing high-speed logistical maneuvers and peak-thermal engagement data, engineers are finalizing specialized chassis intended to better support Helldivers. Today's success has ensured that the light of Liberty and the flames of Justice shall travel further—and purge Tyranny faster—than ever before.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`Restoring the AM Defense Factory Hub on Achernar Secundus has resulted in an abundance of vehicle production. To remove impediments from production lines, High Command authorizes free, fleetwide access to the Fast Recon Vehicle (FRV) Stratagem for all Helldivers on Ursica XI. Helldivers: utilize this fortuitous bounty to liberate Ursica XI with virtuous velocity, and to provide combat telemetry required for forthcoming mobile R&D.` },
-  { n:145, year:2026, date:`Mar 29, 2026`, name:`Operation Valid Pretext (Phase 4: Liberate Cyberstan)`, enemy:`Automaton`, result:`loss`, note:`The Helldivers have successfully liberated Hort. In doing so, they have heroically dismantled the mechanisms behind the Ritual Storm, neutralizing the atmospheric anomaly, and securing the planet. This victory marks our first successful suppression of such a metaphysical threat. High Command advises all forces to pivot immediately: stem the tide of Mindless Masses currently pouring out of the Void. Liberty’s momentum must not falter.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:146, year:2026, date:`Feb 2026`, name:`Operation Belt of Liberty`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:145, year:2026, date:`Mar 29, 2026`, name:`Operation Valid Pretext (Phase 4: Liberate Cyberstan)`, enemy:`Automaton`, result:`loss`, note:`The Helldivers have successfully liberated Hort. In doing so, they have heroically dismantled the mechanisms behind the Ritual Storm, neutralizing the atmospheric anomaly, and securing the planet. This victory marks our first successful suppression of such a metaphysical threat. High Command advises all forces to pivot immediately: stem the tide of Mindless Masses currently pouring out of the Void. Liberty’s momentum must not falter.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+SEASSE has been engulfed by a strange Void. The Illuminate have already begun raising additional Exospires on HORT. If not stopped, it must be assumed the planet will be engulfed as well. Liberate HORT from the Illuminate.
+
+
+Simultaneously, swarms of Voteless have invaded RIRGA BAY. Defend the planet from attack.` },
+  { n:146, year:2026, date:`Feb 2026`, name:`Operation Belt of Liberty`, enemy:`Multi`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Classified readouts indicate a severe escalation of spacetime disruptions across archaeological sites illicitly re-occupied by the Illuminate.
+
+Helldivers must infiltrate Zea Rugosia and Herthon Secundus to extract Rare Samples. These materials will grant crucial insights into this subterranean threat.
+
+Simultaneously, Helldivers must hold Alairt III to protect ongoing excavati...` },
   { n:147, year:2026, date:`Apr 3, 2026`, name:`Operation Astral Mirage`, enemy:`Illuminate`, result:`loss`, note:`The Helldivers successfully completed the missions on key planets. Strategic intel has been relayed to the Ministry of Science. The intel gathered will be a vital component of the Illuminate’s inevitable downfall, possible thanks to the sacrifices of the Helldivers.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Ministry of Science needs intelligence on the Void in order to facilitate the development of technology to interdict the developing threat. The Helldivers must contest Illuminate presence on designated planets, in order to allow research teams to gather data from sites of Illuminate ruins. Successfully complete 2,000,000 missions on selected planets to gather intel.` },
-  { n:148, year:2026, date:`Apr 14, 2026`, name:`Operation Lawful Closure`, enemy:`Automaton`, result:`loss`, note:`Efforts to acquire intel regarding future Cyborg expansion plans have failed. Their next targets remain unknown, and all citizens on nearby planets fear for their voting rights. However, swift Helldiver defensive action rebuffed from CHOEPESSA IV and VARYLIA 5. The citizens there, and their homesteads, remain safe from Cyborg mutilation and dismemberment.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:148, year:2026, date:`Apr 14, 2026`, name:`Operation Lawful Closure`, enemy:`Automaton`, result:`loss`, note:`Efforts to acquire intel regarding future Cyborg expansion plans have failed. Their next targets remain unknown, and all citizens on nearby planets fear for their voting rights. However, swift Helldiver defensive action rebuffed from CHOEPESSA IV and VARYLIA 5. The citizens there, and their homesteads, remain safe from Cyborg mutilation and dismemberment.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+MINDEF intel has assessed with high confidence that a fresh Cyborg effort to expand Megafactories to new planets is imminent. The Helldivers are ordered to complete 5,000,000 missions on MARFARK, to acquire more information about the Cyborg targets.
+
+Cyborg forces have simultaneously launched offensives on CHOEPESSA IV and VARYLIA 5. These may be setup strikes to lay groundwork...` },
   { n:149, year:2026, date:`Apr 15, 2026`, name:`Operation Archaeological Anomaly`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Illuminate have launched unprovoked raids against our most valued territories. Appropriator squads are attempting unauthorized relocation of human assets, threatening Federation workforce productivity. Helldivers: defend against Illuminate attacks, and repel this insidious abduction scheme with righteous vigor.` },
-  { n:150, year:2026, date:`Mar 2026`, name:`Operation Voidfall`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
-  { n:151, year:2026, date:`Mar 2026`, name:`Operation Spring Cleaning`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:null },
+  { n:150, year:2026, date:`Mar 2026`, name:`Operation Voidfall`, enemy:`Illuminate`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER
+
+Highly threatening readings have been observed originating from planet SEASSE, deep in Illuminate territory. Gravitational waves that defy sanctioned scientific models are emanating from the planet, and anomalous weather formations now cover its surface.
+
+The Helldivers are ordered to launch an immediate offensive towards SEASSE, with the objective of determining the nature of ...` },
+  { n:151, year:2026, date:`Mar 2026`, name:`Operation Spring Cleaning`, enemy:`Terminid`, result:`win`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`NEW MAJOR ORDER 
+
+Terminids swarm the Ursa sector. Helldivers must choose which front to defend. These simultaneous assaults are complicated by the presence of Rupture and Predator strains, which must be exterminated. 
+
+Defend the Ursa sector from Terminid attacks and exterminate the Rupture and Predator strains.` },
   { n:152, year:2026, date:`Apr 14, 2026`, name:`Operation Chrome Bulwark`, enemy:`Automaton`, result:`loss`, note:`Efforts to acquire intel regarding future Cyborg expansion plans have failed. Their next targets remain unknown, and all citizens on nearby planets fear for their voting rights.`, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`MINDEF intel has assessed with high confidence that a fresh Cyborg effort to expand Megafactories to new planets is imminent. The Helldivers are ordered to complete a classified mission to intercept Cyborg data and identify their expansion targets before they strike.` },
   { n:153, year:2026, date:`Apr 15, 2026`, name:`Operation Void Attack`, enemy:`Illuminate`, result:`ongoing`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Illuminate have launched unprovoked raids against our most valued territories. Appropriator squads are attempting unauthorized relocation of human assets. The Helldivers are ordered to repel the Illuminate assault.` },
 ];
@@ -1597,7 +1978,24 @@ async function loadGalaxyMap() {
 
   } catch(e) { console.warn('Galaxy map failed:', e); }
 }
-loadGalaxyMap();
+// ── Galaxy Map toggle (lazy-load) ──
+let mapLoaded = false;
+document.getElementById('map-toggle').addEventListener('click', () => {
+  const body = document.getElementById('map-section-body');
+  const icon = document.getElementById('map-toggle-icon');
+  const isOpen = body.classList.toggle('open');
+  icon.textContent = isOpen ? '▴ Hide Map' : '▾ Show Map';
+  if (isOpen && !mapLoaded) {
+    mapLoaded = true;
+    loadGalaxyMap().then(() => {
+      const loading = document.getElementById('map-loading');
+      if (loading) loading.remove();
+    }).catch(() => {
+      const loading = document.getElementById('map-loading');
+      if (loading) loading.textContent = 'Map unavailable — API unreachable.';
+    });
+  }
+});
 
 // ── About dropdown ──
 const aboutBtn   = document.getElementById('about-toggle');
