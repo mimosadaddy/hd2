@@ -1638,7 +1638,7 @@ function renderTable(filter) {
       <td class="td-name">${o.name}</td>
       <td class="enemy-col">${ENEMY_BADGE[o.enemy]}</td>
       <td class="result-col">${RESULT_BADGE[o.result]}</td>
-      <td class="td-note">${o.note}${o.src ? `<a class="note-src" href="${o.src}" target="_blank" rel="noopener">↗ src</a>` : ''}</td>
+      <td class="td-note">${o.note || '<span style="font-style:italic;opacity:0.45">Outcome note not yet retrieved</span>'}${o.src ? `<a class="note-src" href="${o.src}" target="_blank" rel="noopener">↗ src</a>` : ''}</td>
       <td class="td-brief">${o.briefing ?? '<span style="font-style:italic;opacity:0.45">Briefing not yet retrieved — pre-API or unlogged dispatch</span>'}</td>
     </tr>`;
   }).join("");
