@@ -502,6 +502,80 @@
     line-height: 1.5;
   }
 
+  /* ── About panel ── */
+  .about-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .about-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    padding: 1.25rem 1.4rem;
+    width: 360px;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    z-index: 101;
+  }
+
+  .about-panel.open { display: flex; }
+
+  .about-panel-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+
+  .about-section {
+    margin-bottom: 14px;
+  }
+
+  .about-section-heading {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .about-section p {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin: 0 0 5px;
+  }
+
+  .about-section p:last-child { margin-bottom: 0; }
+
+  .about-section a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .about-section a:hover { text-decoration: underline; }
+
+  .about-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 10px 0 14px;
+  }
+
   /* ── Attribution ── */
   .header-credit {
     font-family: var(--font-mono);
@@ -827,6 +901,59 @@
     <button class="toolbar-btn" id="font-decrease" title="Decrease font size">A−</button>
     <button class="toolbar-btn" id="font-increase" title="Increase font size">A+</button>
   </div>
+  <div class="about-wrap">
+    <button class="toolbar-btn" id="about-toggle">About ▾</button>
+    <div class="about-panel" id="about-panel">
+      <div class="about-panel-title">About &amp; Methodology</div>
+
+      <div class="about-section">
+        <div class="about-section-heading">What is this?</div>
+        <p>A complete record of every Major Order issued in Helldivers 2 since launch (Feb 2024 to present) — 153 operations logged with outcomes, factions, and in-game briefing text where available.</p>
+        <p>The goal is a single reference for the full arc of the Second Galactic War: wins, losses, close calls, and story milestones.</p>
+      </div>
+
+      <hr class="about-divider">
+
+      <div class="about-section">
+        <div class="about-section-heading">Primary Data Source</div>
+        <p>The order list is sourced from the <a href="https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0" target="_blank" rel="noopener">human-verified Google Sheet</a> maintained by Reddit user <strong style="color:var(--text)">u/Sad-Needleworker-590</strong>, who tracks every operation manually as the game progresses. This provides the canonical operation names, faction assignments, and outcomes.</p>
+        <p>Briefing text and exact dates are cross-referenced against the <a href="https://api.helldivers2.dev" target="_blank" rel="noopener">helldivers2.dev dispatch API</a>, which archives the in-game dispatch messages sent to players during each order.</p>
+      </div>
+
+      <hr class="about-divider">
+
+      <div class="about-section">
+        <div class="about-section-heading">What counts as a Major Order?</div>
+        <p>Only Major Orders — the primary war objectives issued by High Command — are listed here. This includes multi-phase operations (e.g. Operation Swift Disassembly, Operation Valid Pretext) where each phase is counted separately, matching community convention.</p>
+        <p>Strategic Opportunities and Minor Orders (secondary side objectives) are tracked separately in the source spreadsheet but are not included in this table.</p>
+      </div>
+
+      <hr class="about-divider">
+
+      <div class="about-section">
+        <div class="about-section-heading">Dates</div>
+        <p>All dates are real-world dates, not in-universe dates. The in-game calendar runs ~160 years ahead (Year 2184 = 2024, 2185 = 2025, 2186 = 2026).</p>
+        <p>Exact dates come from dispatch API timestamps where available. Early Feb–Mar 2024 orders predate the API archive and use approximate month-level dates.</p>
+      </div>
+
+      <hr class="about-divider">
+
+      <div class="about-section">
+        <div class="about-section-heading">Win Rate Formula</div>
+        <p>Win rate matches the community spreadsheet formula:</p>
+        <p><code style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">(Victories + 0.5 × Aborted) ÷ Concluded</code></p>
+        <p>Aborted orders (operations that were cancelled before a clear outcome) count as half a win. The currently active order is excluded from the denominator until it resolves.</p>
+      </div>
+
+      <hr class="about-divider">
+
+      <div class="about-section">
+        <div class="about-section-heading">Built by</div>
+        <p><a href="https://danilosierra.com" target="_blank" rel="noopener">danilosierra.com</a> — pure HTML/CSS/JS, no framework, no build step. Source on <a href="https://github.com/mimosadaddy/hd2" target="_blank" rel="noopener">GitHub</a>.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="sources-wrap">
     <button class="toolbar-btn" id="sources-toggle">Sources ▾</button>
     <div class="sources-panel" id="sources-panel">
@@ -1137,13 +1264,15 @@ function renderTable(filter) {
 
   tbody.innerHTML = html;
 
-  const wins   = rows.filter(o => o.result === "win").length;
-  const losses = rows.filter(o => o.result === "loss").length;
-  const total  = rows.length;
-  document.getElementById("stat-total").textContent = total;
+  const wins      = rows.filter(o => o.result === "win").length;
+  const losses    = rows.filter(o => o.result === "loss").length;
+  const aborted   = rows.filter(o => o.result === "partial").length;
+  const concluded = rows.filter(o => o.result !== "ongoing").length; // exclude active order
+  document.getElementById("stat-total").textContent = rows.length;
   document.getElementById("stat-win").textContent   = wins;
   document.getElementById("stat-loss").textContent  = losses;
-  document.getElementById("stat-rate").textContent  = total ? Math.round(wins / total * 100) + "%" : "—";
+  // Match community formula: (wins + 0.5×aborted) / concluded (excl. ongoing)
+  document.getElementById("stat-rate").textContent  = concluded ? Math.round((wins + 0.5 * aborted) / concluded * 100) + "%" : "—";
 }
 
 function setFilter(f) {
@@ -1470,6 +1599,19 @@ async function loadGalaxyMap() {
 }
 loadGalaxyMap();
 
+// ── About dropdown ──
+const aboutBtn   = document.getElementById('about-toggle');
+const aboutPanel = document.getElementById('about-panel');
+aboutBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  aboutPanel.classList.toggle('open');
+  aboutBtn.textContent = aboutPanel.classList.contains('open') ? 'About ▴' : 'About ▾';
+  // close sources if open
+  sourcesPanel.classList.remove('open');
+  sourcesBtn.textContent = 'Sources ▾';
+});
+aboutPanel.addEventListener('click', (e) => e.stopPropagation());
+
 // ── Sources dropdown ──
 const sourcesBtn   = document.getElementById('sources-toggle');
 const sourcesPanel = document.getElementById('sources-panel');
@@ -1477,10 +1619,15 @@ sourcesBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   sourcesPanel.classList.toggle('open');
   sourcesBtn.textContent = sourcesPanel.classList.contains('open') ? 'Sources ▴' : 'Sources ▾';
+  // close about if open
+  aboutPanel.classList.remove('open');
+  aboutBtn.textContent = 'About ▾';
 });
 document.addEventListener('click', () => {
   sourcesPanel.classList.remove('open');
   sourcesBtn.textContent = 'Sources ▾';
+  aboutPanel.classList.remove('open');
+  aboutBtn.textContent = 'About ▾';
 });
 sourcesPanel.addEventListener('click', (e) => e.stopPropagation());
 </script>
