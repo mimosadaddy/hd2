@@ -817,6 +817,125 @@
     display: none;
   }
   .map-section-body.open { display: block; }
+
+  /* ── Map view tabs ── */
+  .map-view-tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--bg);
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    padding: 2px;
+  }
+  .map-view-tab {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.15s;
+  }
+  .map-view-tab.active {
+    background: var(--border-bright);
+    color: var(--text);
+  }
+  .map-view-tab:hover:not(.active) { color: var(--text); }
+
+  /* ── Timeline list view ── */
+  .tl-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .tl-item {
+    display: grid;
+    grid-template-columns: 60px 100px 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+  .tl-item:last-child { border-bottom: none; }
+  .tl-item:hover { background: rgba(255,255,255,0.025); }
+  .tl-n {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+  .tl-date {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .tl-name {
+    font-family: var(--font-cond);
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .tl-year-divider {
+    grid-column: 1/-1;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 10px 14px 4px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(200,168,75,0.04);
+  }
+  .tl-badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.07em;
+    padding: 2px 7px;
+    border: 1px solid;
+    border-radius: 3px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    background: transparent;
+  }
+  @media (max-width: 640px) {
+    .tl-item { grid-template-columns: 50px 1fr auto; }
+    .tl-date { display: none; }
+    .tl-badge:first-of-type { display: none; }
+  }
+
+  /* ── Map legibility improvements ── */
+  .map-name {
+    font-size: 11px;
+    paint-order: stroke fill;
+    stroke: #0a0b0c;
+    stroke-width: 3px;
+    stroke-linejoin: round;
+  }
+  .map-badge {
+    font-size: 8px;
+    paint-order: stroke fill;
+    stroke: #0a0b0c;
+    stroke-width: 2px;
+  }
+  .map-count-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    fill: rgba(232,228,216,0.9);
+    paint-order: stroke fill;
+    stroke: #0a0b0c;
+    stroke-width: 2px;
+    pointer-events: none;
+  }
+
   .map-loading {
     font-family: var(--font-mono);
     font-size: 10px;
@@ -1060,24 +1179,37 @@
   <div class="map-section-header" id="map-toggle">
     <div>
       <div class="map-section-title">Major Order Theatres — Second Galactic War</div>
-      <div class="map-section-sub">Planets where a Major Order was fought · 2024–2026 · Hover for details · Node color = current faction · Ring = win/loss</div>
+      <div class="map-section-sub">Planets where a Major Order was fought · 2024–2026</div>
     </div>
-    <span class="map-toggle-icon" id="map-toggle-icon">▾ Show Map</span>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div class="map-view-tabs" id="map-view-tabs">
+        <button class="map-view-tab active" id="tab-map" data-view="map">Map</button>
+        <button class="map-view-tab" id="tab-timeline" data-view="timeline">Timeline</button>
+      </div>
+      <span class="map-toggle-icon" id="map-toggle-icon">▾ Show</span>
+    </div>
   </div>
   <div class="map-section-body" id="map-section-body">
-    <div id="galaxy-map-wrap">
-      <div class="map-loading" id="map-loading">Loading galaxy map…</div>
-      <svg id="galaxy-map" viewBox="0 0 960 860" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div id="map-tooltip"></div>
-      <div class="map-legend">
-        <div class="map-legend-item"><div class="map-legend-dot" style="background:#c8a84b"></div>Super Earth</div>
-        <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94"></div>Liberated</div>
-        <div class="map-legend-item"><div class="map-legend-dot" style="background:#e8a056"></div>Terminids</div>
-        <div class="map-legend-item"><div class="map-legend-dot" style="background:#e85555"></div>Automatons</div>
-        <div class="map-legend-item"><div class="map-legend-dot" style="background:#9a7ae0"></div>Illuminate</div>
-        <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94; border: 1px solid #8ecf94"></div>Win ring</div>
-        <div class="map-legend-item"><div class="map-legend-dot" style="background:#d98080; border: 1px solid #d98080"></div>Loss ring</div>
+    <!-- MAP VIEW -->
+    <div id="map-view">
+      <div id="galaxy-map-wrap">
+        <div class="map-loading" id="map-loading">Loading galaxy map…</div>
+        <svg id="galaxy-map" viewBox="0 0 960 860" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div id="map-tooltip"></div>
+        <div class="map-legend">
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#c8a84b"></div>Super Earth</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94"></div>Liberated</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#e8a056"></div>Terminids</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#e85555"></div>Automatons</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#9a7ae0"></div>Illuminate</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94;border:1px solid #8ecf94"></div>Win</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#d98080;border:1px solid #d98080"></div>Loss</div>
+        </div>
       </div>
+    </div>
+    <!-- TIMELINE VIEW -->
+    <div id="timeline-view" style="display:none">
+      <div id="timeline-list"></div>
     </div>
   </div>
 </section>
@@ -1911,33 +2043,34 @@ async function loadGalaxyMap() {
       const moList = PLANET_MOS_MAP[p.index] || [];
       const isSE   = p.index === 0;
       const color  = isSE ? '#c8a84b' : (FC[p.currentOwner] || '#c8a84b');
-      const r      = isSE ? 11 : (moList.length > 3 ? 9 : 7);
+      const r      = isSE ? 16 : (moList.length > 1 ? 12 : 9);
       const lastMo = moList[moList.length - 1];
       const res    = lastMo ? moResult[lastMo] : null;
       const ring   = res === 'win' ? '#8ecf94' : res === 'loss' ? '#d98080' : 'rgba(255,255,255,0.2)';
-      const rw     = res ? 2 : 1;
+      const rw     = res ? 2.5 : 1;
       const isRight = pos.x / W > 0.65;
-      const lx     = isRight ? -(r+5) : (r+5);
+      const lx     = isRight ? -(r+6) : (r+6);
       const anchor = isRight ? 'end' : 'start';
 
-      // MO badge chips
-      const bSz = 9, bGap = 14;
-      let chips = '';
-      moList.forEach((n, i) => {
-        const bc  = moResult[n] === 'win' ? '#8ecf94' : '#d98080';
-        const bx  = isRight
-          ? lx - (moList.length - 1 - i) * bGap
-          : lx + i * bGap;
-        chips += `<circle cx="${bx}" cy="${r+14}" r="${bSz/2}" fill="${bc}" fill-opacity="0.2" stroke="${bc}" stroke-width="0.8"/>`;
-        chips += `<text x="${bx}" y="${r+18}" text-anchor="middle" class="map-badge">${n}</text>`;
-      });
+      // Count badge: single ×N chip below node (no overlapping chips)
+      let countBadge = '';
+      if (moList.length > 0) {
+        const wins   = moList.filter(n => moResult[n] === 'win').length;
+        const losses = moList.filter(n => moResult[n] === 'loss').length;
+        const badgeColor = wins > losses ? '#8ecf94' : losses > wins ? '#d98080' : '#c8a84b';
+        const label = moList.length === 1 ? `#${String(moList[0]).padStart(2,'0')}` : `×${moList.length}`;
+        countBadge = `
+  <rect x="${-15}" y="${r+4}" width="30" height="13" rx="3"
+        fill="${badgeColor}" fill-opacity="0.18" stroke="${badgeColor}" stroke-width="0.8"/>
+  <text x="0" y="${r+14}" text-anchor="middle" class="map-count-label" fill="${badgeColor}">${label}</text>`;
+      }
 
       nodesSVG += `
 <g class="map-planet" data-idx="${p.index}" transform="translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)})">
-  ${isSE ? `<circle r="20" fill="rgba(200,168,75,0.07)" stroke="#c8a84b" stroke-width="0.8" stroke-dasharray="4 4"/>` : ''}
+  ${isSE ? `<circle r="26" fill="rgba(200,168,75,0.07)" stroke="#c8a84b" stroke-width="0.8" stroke-dasharray="4 4"/>` : ''}
   <circle r="${r}" fill="${color}" fill-opacity="${isSE?1:0.85}" stroke="${ring}" stroke-width="${rw}" class="map-dot"/>
   <text x="${lx}" y="${-r-4}" text-anchor="${anchor}" class="map-name${isSE?' map-name-se':''}">${p.name}</text>
-  ${chips}
+  ${countBadge}
 </g>`;
     });
 
@@ -1978,13 +2111,66 @@ async function loadGalaxyMap() {
 
   } catch(e) { console.warn('Galaxy map failed:', e); }
 }
+// ── Timeline renderer ──
+function renderTimeline() {
+  const list = document.getElementById('timeline-list');
+  if (!list || list.dataset.rendered) return;
+  list.dataset.rendered = '1';
+
+  const FC_LABEL = { Terminid:'Terminid', Automaton:'Automaton', Illuminate:'Illuminate', Multi:'Multi-front' };
+  const FC_COLOR = { Terminid:'#e8a056', Automaton:'#56a8e8', Illuminate:'#9a7ae0', Multi:'#7aaa7a' };
+  const RES_COLOR = { win:'#8ecf94', loss:'#d98080', partial:'#d4a84b' };
+  const RES_LABEL = { win:'VICTORY', loss:'DEFEAT', partial:'PARTIAL' };
+
+  // newest first
+  const sorted = [...orders].reverse();
+  let html = '<div class="tl-list">';
+  let lastYear = null;
+  sorted.forEach(o => {
+    if (o.year !== lastYear) {
+      const inUniverse = o.year + 160;
+      html += `<div class="tl-item tl-year-divider">
+        <span>— ${o.year} · IN-UNIVERSE: ${inUniverse} —</span>
+      </div>`;
+      lastYear = o.year;
+    }
+    const fc = o.enemy || 'Multi';
+    const fcColor = FC_COLOR[fc] || '#c8a84b';
+    const fcLabel = FC_LABEL[fc] || fc;
+    const resColor = RES_COLOR[o.result] || '#888';
+    const resLabel = RES_LABEL[o.result] || o.result.toUpperCase();
+    html += `<div class="tl-item">
+      <span class="tl-n">#${String(o.n).padStart(3,'0')}</span>
+      <span class="tl-date">${o.date}</span>
+      <span class="tl-name">${o.name}</span>
+      <span class="tl-badge" style="color:${fcColor};border-color:${fcColor}">${fcLabel}</span>
+      <span class="tl-badge tl-result" style="color:${resColor};border-color:${resColor}">${resLabel}</span>
+    </div>`;
+  });
+  html += '</div>';
+  list.innerHTML = html;
+}
+
+// ── Map / Timeline tab switching ──
+document.querySelectorAll('.map-view-tab').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation(); // don't trigger the map-toggle collapse
+    const view = btn.dataset.view;
+    document.querySelectorAll('.map-view-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('map-view').style.display      = view === 'map'      ? '' : 'none';
+    document.getElementById('timeline-view').style.display = view === 'timeline' ? '' : 'none';
+    if (view === 'timeline') renderTimeline();
+  });
+});
+
 // ── Galaxy Map toggle (lazy-load) ──
 let mapLoaded = false;
 document.getElementById('map-toggle').addEventListener('click', () => {
   const body = document.getElementById('map-section-body');
   const icon = document.getElementById('map-toggle-icon');
   const isOpen = body.classList.toggle('open');
-  icon.textContent = isOpen ? '▴ Hide Map' : '▾ Show Map';
+  icon.textContent = isOpen ? '▴ Hide' : '▾ Show';
   if (isOpen && !mapLoaded) {
     mapLoaded = true;
     loadGalaxyMap().then(() => {
