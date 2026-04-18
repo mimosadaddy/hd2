@@ -906,10 +906,41 @@
     text-transform: uppercase;
     background: transparent;
   }
+  /* Planet-grouped rows */
+  .tl-planet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px 7px;
+    border-bottom: 1px solid var(--border-bright);
+    background: rgba(255,255,255,0.03);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .tl-planet-name {
+    font-family: var(--font-cond);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .tl-planet-count {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+  }
+  .tl-planet-mo {
+    grid-template-columns: 60px 100px 1fr auto;
+    padding-left: 28px;
+  }
   @media (max-width: 640px) {
     .tl-item { grid-template-columns: 50px 1fr auto; }
+    .tl-planet-mo { grid-template-columns: 50px 1fr auto; }
     .tl-date { display: none; }
-    .tl-badge:first-of-type { display: none; }
   }
 
   /* ── Map legibility improvements ── */
@@ -1184,7 +1215,7 @@
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
       <div class="map-view-tabs" id="map-view-tabs">
         <button class="map-view-tab active" id="tab-map" data-view="map">Map</button>
-        <button class="map-view-tab" id="tab-timeline" data-view="timeline">Timeline</button>
+        <button class="map-view-tab" id="tab-timeline" data-view="timeline">By Planet</button>
       </div>
       <span class="map-toggle-icon" id="map-toggle-icon">▾ Show</span>
     </div>
@@ -2111,41 +2142,64 @@ async function loadGalaxyMap() {
 
   } catch(e) { console.warn('Galaxy map failed:', e); }
 }
-// ── Timeline renderer ──
+// ── Planet list renderer (map "By Planet" view) ──
 function renderTimeline() {
   const list = document.getElementById('timeline-list');
   if (!list || list.dataset.rendered) return;
   list.dataset.rendered = '1';
 
-  const FC_LABEL = { Terminid:'Terminid', Automaton:'Automaton', Illuminate:'Illuminate', Multi:'Multi-front' };
-  const FC_COLOR = { Terminid:'#e8a056', Automaton:'#56a8e8', Illuminate:'#9a7ae0', Multi:'#7aaa7a' };
-  const RES_COLOR = { win:'#8ecf94', loss:'#d98080', partial:'#d4a84b' };
-  const RES_LABEL = { win:'VICTORY', loss:'DEFEAT', partial:'PARTIAL' };
+  // Human-readable planet names keyed by planet index
+  const PLANET_NAMES = {
+    0:'Super Earth', 7:'Zea Rugosia', 34:'Hellmire', 64:'Meridia',
+    69:'Imber', 78:'Crimsica', 79:'Heeth', 82:'Ursica XI',
+    89:'Mog', 95:'Genesis Prime', 112:'Vernen Wells', 114:'Aurora Bay',
+    125:'Fenrir III', 126:'Turing', 127:"Angel's Venture", 129:'Acamar IV',
+    130:'Achernar Secundus', 135:'Adhara', 138:'Alairt III', 153:'Draupnir',
+    156:'Charbal-VII', 162:'Clasa', 168:'Erata Prime', 169:'Estanu',
+    180:'Herthon Secundus', 183:'Hort', 196:'Malevelon Creek', 204:'Merak',
+    212:'Oshaune', 226:'Rirga Bay', 227:'Seasse', 238:'Tibit',
+    239:'Tien Kwan', 240:'Troost', 241:'Ubanea', 243:'Vandalon IV',
+    244:'Varylia 5', 250:'Yed Prior', 259:'Omicron', 260:'Cyberstan',
+    262:'K-class world'
+  };
 
-  // newest first
-  const sorted = [...orders].reverse();
+  const RES_COLOR = { win:'#8ecf94', loss:'#d98080', partial:'#d4a84b' };
+  const RES_ICON  = { win:'✓', loss:'✗', partial:'~' };
+
+  // MO lookup by number
+  const moByN = {};
+  orders.forEach(o => { moByN[o.n] = o; });
+
+  // Sort planets: most-recent MO (highest n) first
+  const sorted = Object.entries(PLANET_MOS_MAP)
+    .map(([id, moList]) => ({ id: parseInt(id), moList: [...moList] }))
+    .sort((a, b) => Math.max(...b.moList) - Math.max(...a.moList));
+
   let html = '<div class="tl-list">';
-  let lastYear = null;
-  sorted.forEach(o => {
-    if (o.year !== lastYear) {
-      const inUniverse = o.year + 160;
-      html += `<div class="tl-item tl-year-divider">
-        <span>— ${o.year} · IN-UNIVERSE: ${inUniverse} —</span>
-      </div>`;
-      lastYear = o.year;
-    }
-    const fc = o.enemy || 'Multi';
-    const fcColor = FC_COLOR[fc] || '#c8a84b';
-    const fcLabel = FC_LABEL[fc] || fc;
-    const resColor = RES_COLOR[o.result] || '#888';
-    const resLabel = RES_LABEL[o.result] || o.result.toUpperCase();
-    html += `<div class="tl-item">
-      <span class="tl-n">#${String(o.n).padStart(3,'0')}</span>
-      <span class="tl-date">${o.date}</span>
-      <span class="tl-name">${o.name}</span>
-      <span class="tl-badge" style="color:${fcColor};border-color:${fcColor}">${fcLabel}</span>
-      <span class="tl-badge tl-result" style="color:${resColor};border-color:${resColor}">${resLabel}</span>
+  sorted.forEach(({ id, moList }) => {
+    const name  = PLANET_NAMES[id] || `Planet ${id}`;
+    const wins  = moList.filter(n => moByN[n]?.result === 'win').length;
+    const losses= moList.filter(n => moByN[n]?.result === 'loss').length;
+    const hColor= wins > losses ? '#8ecf94' : losses > wins ? '#d98080' : '#c8a84b';
+
+    html += `<div class="tl-planet-header">
+      <span class="tl-planet-name" style="color:${hColor}">${name}</span>
+      <span class="tl-planet-count">${moList.length} MO${moList.length > 1 ? 's' : ''} · ${wins}W ${losses}L</span>
     </div>`;
+
+    // Newest MO first within each planet
+    [...moList].sort((a,b) => b - a).forEach(n => {
+      const o = moByN[n];
+      if (!o) return;
+      const rc = RES_COLOR[o.result] || '#888';
+      const ri = RES_ICON[o.result] || '?';
+      html += `<div class="tl-item tl-planet-mo">
+        <span class="tl-n">#${String(n).padStart(3,'0')}</span>
+        <span class="tl-date">${o.date}</span>
+        <span class="tl-name">${o.name}</span>
+        <span class="tl-badge" style="color:${rc};border-color:${rc}">${ri} ${o.result?.toUpperCase()}</span>
+      </div>`;
+    });
   });
   html += '</div>';
   list.innerHTML = html;
