@@ -699,6 +699,123 @@
     .co-header { flex-wrap: wrap; gap: 4px; }
 
     footer { padding: 1rem; font-size: 11px; }
+    .map-section { padding: 1.25rem 1rem 2rem; }
+  }
+
+  /* ── Galaxy Map ── */
+  .map-section {
+    padding: 1.5rem 2rem 3rem;
+    border-top: 1px solid var(--border);
+  }
+  .map-section-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .map-section-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+  }
+  #galaxy-map-wrap {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  #galaxy-map {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .map-edge {
+    stroke: rgba(255,255,255,0.08);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 4;
+  }
+  .map-planet { cursor: pointer; }
+  .map-dot { transition: opacity 0.12s; }
+  .map-planet:hover .map-dot { opacity: 1 !important; }
+  .map-planet:hover .map-dot-ring { r: 14; }
+  .map-name {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: rgba(232,228,216,0.65);
+    pointer-events: none;
+    letter-spacing: 0.04em;
+  }
+  .map-name-se { fill: #c8a84b; font-size: 11px; }
+  .map-badge {
+    font-family: var(--font-mono);
+    font-size: 7px;
+    fill: rgba(232,228,216,0.75);
+    pointer-events: none;
+  }
+  #map-tooltip {
+    display: none;
+    position: absolute;
+    background: var(--surface2);
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    padding: 10px 14px;
+    min-width: 220px;
+    max-width: 340px;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+  .tt-head {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text);
+    letter-spacing: 0.1em;
+    margin-bottom: 3px;
+  }
+  .tt-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+  .tt-mo {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 3px 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.4;
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+  }
+  .tt-mo:last-child { border-bottom: none; }
+  .tt-n { font-family: var(--font-mono); font-size: 10px; color: var(--accent); white-space: nowrap; }
+  .map-legend {
+    display: flex;
+    gap: 1.25rem;
+    padding: 0.6rem 1rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .map-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .map-legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
   }
 </style>
 </head>
@@ -781,6 +898,24 @@
   </div>
 </main>
 
+<section class="map-section">
+  <div class="map-section-title">Major Order Theatres — Second Galactic War</div>
+  <div class="map-section-sub">Planets where a Major Order was fought · 2024–2026 · Hover for details · Node color = current faction · Ring = win/loss</div>
+  <div id="galaxy-map-wrap">
+    <svg id="galaxy-map" viewBox="0 0 960 860" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="map-tooltip"></div>
+    <div class="map-legend">
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#c8a84b"></div>Super Earth</div>
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94"></div>Liberated</div>
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#e8a056"></div>Terminids</div>
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#e85555"></div>Automatons</div>
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#9a7ae0"></div>Illuminate</div>
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#8ecf94; border: 1px solid #8ecf94"></div>Win ring</div>
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#d98080; border: 1px solid #d98080"></div>Loss ring</div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <span>Sources: helldivers.wiki.gg · helldivers.fandom.com · Galactic War Timeline (community) · various news reports</span>
   <span class="footer-credit">
@@ -824,8 +959,8 @@ const orders = [
   { n:28, year:2025, date:"Sep 2025",        name:"Collect 250M Common & 200M Rare Samples on Oshaune (first Hive World MO)",          enemy:"Terminid",  result:"loss",    note:"'Into the Unjust' update. Community failed in underground cave biomes. Historically bad result.",              src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025", briefing:"Operation Righteous Reclamation has entered its second stage. Outpost Alpha enables the Helldivers' spore-resistant Super Destroyers to access the Hive World OSHAUNE. The Helldivers are ordered to conduct initial reconnaissance of the Hive World and secure research samples from it. Understanding this unique biome is key to annihilating it for good." },
   { n:29, year:2025, date:"Oct 2025",        name:"Liberate Erata Prime & Estanu while holding Hellmire",                              enemy:"Terminid",  result:"win",     note:"Liberty Day saved. Explosive stockpiles secured. Citizens across Super Earth enjoyed a continuous 24-hour Pyrotechny Display in honor of the Helldivers' sacrifice.",                               src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025", briefing:"Preparations for Liberty Day are underway. Helldivers tasked with seizing statute-violating Automaton explosive stockpiles to fuel the Super Earth Patriotic Pyrotechny Display and save Liberty Day for families everywhere." },
   { n:30, year:2025, date:"Nov–Dec 2025",    name:"Stop Illuminate attacks to slow Meridia's trajectory",                              enemy:"Illuminate",result:"win",     note:"5,000,000 Voteless annihilated using the Orbital Laser Stratagem, demonstrating the inescapable security of Managed Democracy to all loyal citizens.",                                    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2025", briefing:"The Center for Citizen Surveillance & Safety reports rampant dissident activity on domestic planets. Helldivers ordered to secure 15,000,000 Illuminate samples and 62,500,000 Automaton samples to develop new surveillance technology." },
-  { n:31, year:2026, date:"Feb 13, 2026",    name:"Active order disrupted by exploit attempt — galactic war briefly disabled",         enemy:"Multi",     result:"win",     note:"Players attempted to auto-complete via exploit. War paused & counters adjusted. Order completed.",            src:"https://helldivers.wiki.gg/wiki/Major_Orders", briefing:"To identify the culprit behind the Star of Peace blueprint espionage, simultaneous searches of Automaton and Illuminate data storage nodes will be conducted. Helldivers must hold CLASA, YED PRIOR, MOG, and ADHARA to allow deep-system archival synchronization. Democracy demands simple, uncomplex truth." },
-  { n:32, year:2026, date:"Feb 14, 2026",   name:"Recover Titan-class Terminid eggs for Super Earth science programs",                   enemy:"Terminid",  result:"win",     note:"Culling complete. Millions of inert Titan-class eggs secured and shipped. Proceeds funded the INCENDIARY GATLING BARRAGE Stratagem for 24 hours and 70,000,000 reinforcement recruits.",    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2026", briefing:"To identify the culprit behind the Star of Peace blueprint espionage, simultaneous searches of Automaton and Illuminate data storage nodes will be conducted. Helldivers must hold CLASA, YED PRIOR, MOG, and ADHARA to allow deep-system archival synchronization. Democracy demands simple, uncomplex truth." },
+  { n:31, year:2026, date:"Feb 3–21, 2026",  name:"Operation VALID PRETEXT — Invade and liberate Cyberstan, the Automaton homeworld",  enemy:"Automaton", result:"loss",    note:"4-phase invasion. Ph.I: Merak liberated as staging ground. Ph.II: Synchronized blitz established Drophead on surface. Ph.III: Megafactories Autonomy and Omniparitus destroyed. Ph.IV: 200M reinforcement budget depleted before Transcendence fell. Terminal Directive activated — DSS bombarded Cyberstan for 48 hours.", src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2026", briefing:"High Command orders the initiation of Operation VALID PRETEXT. The objective is the liberation of Cyberstan from the Automaton Legion, in order to deny the inevitable development of socialist planet-destroying capabilities. Phase I: March to Cyberstan — hold Aurora Bay or Merak to establish a staging ground for the invasion fleet." },
+  { n:32, year:2026, date:"Feb 14, 2026",   name:"Recover Titan-class Terminid eggs for Super Earth science programs",                   enemy:"Terminid",  result:"win",     note:"Culling complete. Millions of inert Titan-class eggs secured and shipped. Proceeds funded the INCENDIARY GATLING BARRAGE Stratagem for 24 hours and 70,000,000 reinforcement recruits. Ran concurrently with Operation VALID PRETEXT.",    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2026", briefing:"To augment ongoing operations on Cyberstan, the Ministry of Defense has authorized the procurement of inert Terminid eggs for sale as high-value patriotic curios to Class-A citizens. Helldivers: cull Chargers, Impalers, and Bile Titans to allow xenozoologists to retrieve their eggs." },
   { n:33, year:2026, date:"Mar 1, 2026",    name:"Defend Oshaune from Terminid invasion and contain the Gloom",                          enemy:"Terminid",  result:"win",     note:"Terminids repelled from Oshaune. Gloom contained. Orbital Gatling Barrage Stratagem unlocked fleetwide as reward.",     src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2026", briefing:null },
   { n:34, year:2026, date:"Mar 2, 2026",    name:"Repel irrational Terminid mass mobilization across multiple sectors",                  enemy:"Terminid",  result:"win",     note:"Terminids' unexpected large-scale mobilization repelled. Net gain in planetary liberation secured.",                    src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2026", briefing:null },
   { n:35, year:2026, date:"Mar 9, 2026",    name:"Reclaim Achernar Secundus and rebuild the AM Defense Factory Hub",                     enemy:"Terminid",  result:"win",     note:"Achernar Secundus reclaimed. AM Defense Factory Hub reconstruction underway. AM Defense issued a \"Customer Appreciation\" dividend: Fast Recon Vehicle (FRV) Stratagem available fleetwide for 24 hours.", src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_2026", briefing:"The AM Defense Factory Hub on Achernar Secundus has lain in ruins since the Terminid invasion. Liberating it will allow AM Defense to rebuild and restore critical supply chains strained by recent peacekeeping operations — a high priority for the Ministry of Prosperity." },
@@ -1049,6 +1184,180 @@ async function loadCurrentOrder() {
 }
 
 loadCurrentOrder();
+
+// ── Galaxy Map ──────────────────────────────────────────────────
+const MO_PLANET_IDS = new Set([
+  0,7,34,64,69,78,79,82,89,95,112,114,125,126,127,
+  129,130,135,138,153,156,162,168,169,180,183,
+  196,204,212,226,227,238,239,240,241,243,244,250,259,260,262
+]);
+
+const PLANET_MOS_MAP = {
+  0:  [16,25,29,32],   // SUPER EARTH
+  7:  [36],            // ZEA RUGOSIA
+  34: [29],            // HELLMIRE
+  64: [3,8,23,30],     // MERIDIA
+  69: [16],            // IMBER
+  78: [27],            // CRIMSICA
+  79: [1],             // HEETH
+  82: [40],            // URSICA XI
+  89: [31,32],         // MOG
+  95: [21],            // GENESIS PRIME
+  112:[15,17],         // VERNEN WELLS
+  125:[3],             // FENRIR III
+  126:[3,5,43,44],     // TURING
+  127:[1,13,23],       // ANGEL'S VENTURE
+  129:[19,27],         // ACAMAR IV
+  130:[35,36],         // ACHERNAR SECUNDUS
+  135:[31,32],         // ADHARA
+  138:[36],            // ALAIRT III
+  153:[4],             // DRAUPNIR
+  156:[37,38],         // CHARBAL-VII
+  162:[31,32],         // CLASA
+  168:[3,29],          // ERATA PRIME
+  169:[29],            // ESTANU
+  180:[36],            // HERTHON SECUNDUS
+  183:[15,17,24,40],   // HORT
+  196:[6],             // MALEVELON CREEK
+  212:[27,28,33],      // OSHAUNE
+  226:[40],            // RIRGA BAY
+  227:[39,40],         // SEASSE
+  238:[5],             // TIBIT
+  239:[7],             // TIEN KWAN
+  240:[14],            // TROOST
+  241:[4],             // UBANEA
+  243:[14],            // VANDALON IV
+  244:[8,13],          // VARYLIA 5
+  250:[31,32],         // YED PRIOR
+  259:[43,44],         // OMICRON
+  114:[31],            // AURORA BAY (VALID PRETEXT Phase I staging)
+  204:[31],            // MERAK (VALID PRETEXT Phase I liberated)
+  260:[31],            // CYBERSTAN (VALID PRETEXT — failed liberation)
+  262:[4,6,8],         // K
+};
+
+async function loadGalaxyMap() {
+  const svg  = document.getElementById('galaxy-map');
+  const wrap = document.getElementById('galaxy-map-wrap');
+  if (!svg) return;
+  try {
+    const res = await fetch('https://api.helldivers2.dev/api/v1/planets', {
+      headers: { 'X-Super-Client':'hd2-major-orders-dashboard','X-Super-Contact':'dxnilosierra' }
+    });
+    const allPlanets = await res.json();
+    const planets = allPlanets.filter(p => MO_PLANET_IDS.has(p.index));
+
+    // Build MO result + name lookups from existing orders array
+    const moResult = {}, moName = {};
+    orders.forEach(o => { moResult[o.n] = o.result; moName[o.n] = o.name; });
+
+    // Coordinate transform
+    const W = 960, H = 860, PAD = 80;
+    const xs = planets.map(p => p.position.x);
+    const ys = planets.map(p => p.position.y);
+    const xMin = Math.min(...xs), xMax = Math.max(...xs);
+    const yMin = Math.min(...ys), yMax = Math.max(...ys);
+    const scale = Math.min((W - PAD*2)/(xMax-xMin), (H - PAD*2)/(yMax-yMin));
+    const cW = (xMax-xMin)*scale, cH = (yMax-yMin)*scale;
+    const offX = (W-cW)/2, offY = (H-cH)/2;
+    const tx = x => offX + (x-xMin)*scale;
+    const ty = y => H - offY - (y-yMin)*scale; // flip Y
+
+    const posMap = {};
+    planets.forEach(p => { posMap[p.index] = { x: tx(p.position.x), y: ty(p.position.y) }; });
+
+    const FC = { Humans:'#8ecf94', Terminids:'#e8a056', Automaton:'#e85555', Illuminate:'#9a7ae0' };
+
+    // ── Edges ──
+    let edgesSVG = '';
+    const drawn = new Set();
+    planets.forEach(p => {
+      (p.waypoints||[]).forEach(wi => {
+        if (!MO_PLANET_IDS.has(wi)) return;
+        const key = [Math.min(p.index,wi), Math.max(p.index,wi)].join('-');
+        if (drawn.has(key)) return;
+        drawn.add(key);
+        const a = posMap[p.index], b = posMap[wi];
+        if (a && b) edgesSVG += `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" class="map-edge"/>`;
+      });
+    });
+
+    // ── Nodes + Labels ──
+    let nodesSVG = '';
+    planets.forEach(p => {
+      const pos = posMap[p.index];
+      if (!pos) return;
+      const moList = PLANET_MOS_MAP[p.index] || [];
+      const isSE   = p.index === 0;
+      const color  = isSE ? '#c8a84b' : (FC[p.currentOwner] || '#c8a84b');
+      const r      = isSE ? 11 : (moList.length > 3 ? 9 : 7);
+      const lastMo = moList[moList.length - 1];
+      const res    = lastMo ? moResult[lastMo] : null;
+      const ring   = res === 'win' ? '#8ecf94' : res === 'loss' ? '#d98080' : 'rgba(255,255,255,0.2)';
+      const rw     = res ? 2 : 1;
+      const isRight = pos.x / W > 0.65;
+      const lx     = isRight ? -(r+5) : (r+5);
+      const anchor = isRight ? 'end' : 'start';
+
+      // MO badge chips
+      const bSz = 9, bGap = 14;
+      let chips = '';
+      moList.forEach((n, i) => {
+        const bc  = moResult[n] === 'win' ? '#8ecf94' : '#d98080';
+        const bx  = isRight
+          ? lx - (moList.length - 1 - i) * bGap
+          : lx + i * bGap;
+        chips += `<circle cx="${bx}" cy="${r+14}" r="${bSz/2}" fill="${bc}" fill-opacity="0.2" stroke="${bc}" stroke-width="0.8"/>`;
+        chips += `<text x="${bx}" y="${r+18}" text-anchor="middle" class="map-badge">${n}</text>`;
+      });
+
+      nodesSVG += `
+<g class="map-planet" data-idx="${p.index}" transform="translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)})">
+  ${isSE ? `<circle r="20" fill="rgba(200,168,75,0.07)" stroke="#c8a84b" stroke-width="0.8" stroke-dasharray="4 4"/>` : ''}
+  <circle r="${r}" fill="${color}" fill-opacity="${isSE?1:0.85}" stroke="${ring}" stroke-width="${rw}" class="map-dot"/>
+  <text x="${lx}" y="${-r-4}" text-anchor="${anchor}" class="map-name${isSE?' map-name-se':''}">${p.name}</text>
+  ${chips}
+</g>`;
+    });
+
+    svg.innerHTML = edgesSVG + nodesSVG;
+
+    // ── Tooltip ──
+    const tt = document.getElementById('map-tooltip');
+    svg.querySelectorAll('.map-planet').forEach(g => {
+      const idx = parseInt(g.dataset.idx);
+      const p   = planets.find(x => x.index === idx);
+      if (!p) return;
+      const moList = PLANET_MOS_MAP[idx] || [];
+
+      g.addEventListener('mouseenter', () => {
+        const moItems = moList.map(n => {
+          const icon = moResult[n] === 'win'
+            ? `<span style="color:#8ecf94">✓</span>`
+            : `<span style="color:#d98080">✗</span>`;
+          return `<div class="tt-mo">${icon}<span class="tt-n">#${String(n).padStart(2,'0')}</span><span>${moName[n]||''}</span></div>`;
+        }).join('');
+        tt.innerHTML = `
+          <div class="tt-head">${p.name}</div>
+          <div class="tt-sub">${p.sector} Sector · <span style="color:${FC[p.currentOwner]||'#c8a84b'}">${p.currentOwner}</span></div>
+          ${moItems}`;
+        tt.style.display = 'block';
+      });
+      g.addEventListener('mousemove', e => {
+        const rect = wrap.getBoundingClientRect();
+        let x = e.clientX - rect.left + 18;
+        let y = e.clientY - rect.top  - 10;
+        if (x + 280 > rect.width)  x -= 300;
+        if (y + tt.offsetHeight > rect.height) y -= tt.offsetHeight + 20;
+        tt.style.left = x + 'px';
+        tt.style.top  = y + 'px';
+      });
+      g.addEventListener('mouseleave', () => { tt.style.display = 'none'; });
+    });
+
+  } catch(e) { console.warn('Galaxy map failed:', e); }
+}
+loadGalaxyMap();
 
 // ── Sources dropdown ──
 const sourcesBtn   = document.getElementById('sources-toggle');
