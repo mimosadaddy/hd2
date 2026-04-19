@@ -358,7 +358,7 @@
 
   td {
     padding: 10px 12px;
-    vertical-align: top;
+    vertical-align: middle;
     color: var(--text);
   }
 
@@ -369,7 +369,6 @@
     font-size: 11px;
     color: var(--dim);
     white-space: nowrap;
-    padding-top: 12px;
   }
 
   .td-date {
@@ -402,7 +401,7 @@
   /* Row expand toggle */
   .td-expand {
     width: 28px;
-    padding: 0 4px 0 0;
+    padding: 10px 4px 10px 0;
     vertical-align: middle;
     text-align: center;
   }
@@ -418,13 +417,15 @@
   tr.data-row { cursor: pointer; }
   tr.data-row:hover .expand-icon { color: var(--muted); }
   tr.data-row.open .expand-icon { transform: rotate(90deg); color: var(--accent); }
+  tr.data-row.open { border-bottom: none; }
 
   /* Expandable detail row */
   tr.row-detail { display: none; }
   tr.row-detail.open { display: table-row; }
   tr.row-detail td {
     padding: 0;
-    border-bottom: 1px solid var(--border-bright);
+    border-top: none;
+    border-bottom: 2px solid var(--border-bright);
   }
   .row-detail-inner {
     display: grid;
