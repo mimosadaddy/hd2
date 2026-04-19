@@ -1040,13 +1040,16 @@
     .header-meta { grid-template-columns: repeat(2, 1fr); }
     .meta-val { font-size: 34px; }
 
-    /* Table: status badges wrap naturally on mobile — no columns to hide */
+    /* Table: hide Date + Type on mobile to fit in ~375px */
+    table { table-layout: auto; }
+    thead th:nth-child(3),
+    thead th:nth-child(5) { display: none; }
+    .td-date, .td-type { display: none; }
     .td-name { font-size: 13px; max-width: none; }
-    .td-status { gap: 4px; }
+    .td-num  { font-size: 10px; }
     /* Detail row: single column on mobile */
     .row-detail-inner { grid-template-columns: 1fr; }
     .detail-col + .detail-col { padding: 12px 0 0 0; border-left: none; border-top: 1px solid var(--border); }
-    .td-date { font-size: 10px; }
 
     /* Controls: drop "Faction:" label on mobile */
     .controls-label { display: none; }
@@ -1439,10 +1442,17 @@
       <hr class="about-divider">
 
       <div class="about-section">
-        <div class="about-section-heading">Win Rate Formula</div>
+        <div class="about-section-heading">Results &amp; Win Rate</div>
+        <p>Each Major Order has one of four outcomes:</p>
+        <ul style="margin:8px 0 10px 1rem;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)">
+          <li><strong style="color:var(--win-text)">Victory</strong> — Helldivers completed the objective within the time limit.</li>
+          <li><strong style="color:var(--loss-text)">Defeat</strong> — The order expired or failed before the objective was met.</li>
+          <li><strong style="color:var(--partial-text)">Partial</strong> — The order was cancelled or aborted by High Command before a clear outcome. Only 2 such orders exist in the record. These count as half a win in the formula below.</li>
+          <li><strong style="color:var(--muted)">Ongoing</strong> — The order is currently active and is excluded from all win rate calculations until it resolves.</li>
+        </ul>
         <p>Win rate matches the community spreadsheet formula:</p>
-        <p><code style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">(Victories + 0.5 × Aborted) ÷ Concluded</code></p>
-        <p>Aborted orders (operations that were cancelled before a clear outcome) count as half a win. The currently active order is excluded from the denominator until it resolves.</p>
+        <p><code style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">(Victories + 0.5 × Partial) ÷ Concluded</code></p>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px">The win rate in the header always reflects the full historical record regardless of any active filters.</p>
       </div>
 
       <hr class="about-divider">
@@ -2294,13 +2304,14 @@ function renderTable(filter) {
 
   const wins      = rows.filter(o => o.result === "win").length;
   const losses    = rows.filter(o => o.result === "loss").length;
-  const aborted   = rows.filter(o => o.result === "partial").length;
-  const concluded = rows.filter(o => o.result !== "ongoing").length; // exclude active order
   document.getElementById("stat-total").textContent = rows.length;
   document.getElementById("stat-win").textContent   = wins;
   document.getElementById("stat-loss").textContent  = losses;
-  // Match community formula: (wins + 0.5×aborted) / concluded (excl. ongoing)
-  document.getElementById("stat-rate").textContent  = concluded ? Math.round((wins + 0.5 * aborted) / concluded * 100) + "%" : "—";
+  // Win rate always from full dataset — filtering to defeats shouldn't show "0% win rate"
+  const allWins      = orders.filter(o => o.result === "win").length;
+  const allAborted   = orders.filter(o => o.result === "partial").length;
+  const allConcluded = orders.filter(o => o.result !== "ongoing").length;
+  document.getElementById("stat-rate").textContent  = allConcluded ? Math.round((allWins + 0.5 * allAborted) / allConcluded * 100) + "%" : "—";
 }
 
 function setFilter(f) {
