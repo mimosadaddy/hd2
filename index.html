@@ -129,11 +129,31 @@
     letter-spacing: 0.05em;
   }
 
+  /* ── Two-column header layout ── */
+  .header-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 20px;
+    margin-top: 1.75rem;
+    align-items: start;
+  }
+
+  .header-live-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header-stats-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .header-meta {
     display: grid;
-    grid-template-columns: repeat(4, minmax(140px, 200px));
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    margin-top: 1.75rem;
+    margin-top: 0;
   }
 
   .meta-item {
@@ -293,7 +313,12 @@
   .filter-btn.t-lib.active  { border-color: #56a8e8; color: #56a8e8; background: rgba(86,168,232,0.1); }
   .filter-btn.t-def.active  { border-color: #c8a84b; color: #c8a84b; background: rgba(200,168,75,0.1); }
   .filter-btn.t-ctrl.active { border-color: #9a7ae0; color: #9a7ae0; background: rgba(154,122,224,0.1); }
-  .controls + .controls { margin-top: -10px; }
+  .controls-divider {
+    color: var(--border-bright);
+    font-size: 14px;
+    margin: 0 4px;
+    user-select: none;
+  }
 
   .table-wrap {
     overflow-x: auto;
@@ -363,10 +388,7 @@
     line-height: 1.3;
   }
 
-  .td-type {
-    white-space: nowrap;
-    min-width: 90px;
-  }
+  .td-type { white-space: nowrap; min-width: 90px; }
   .type-badge {
     display: inline-block;
     font-family: var(--font-mono);
@@ -739,9 +761,11 @@
     border: 1px solid var(--accent);
     border-radius: 4px;
     padding: 1rem 1.25rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
     position: relative;
     overflow: hidden;
+    height: 100%;
+    box-sizing: border-box;
   }
 
   .current-order::before {
@@ -889,6 +913,11 @@
   .result-col { white-space: nowrap; }
   .enemy-col  { white-space: nowrap; }
 
+  @media (max-width: 900px) {
+    .header-dashboard { grid-template-columns: 1fr; }
+    .current-order { height: auto; }
+  }
+
   @media (max-width: 640px) {
     body { font-size: 16px; }
     header, main { padding: 1.25rem 1rem; }
@@ -898,10 +927,9 @@
     .header-meta { grid-template-columns: repeat(2, 1fr); }
     .meta-val { font-size: 34px; }
 
-    /* Table: hide Enemy + Type columns on mobile */
-    th:nth-child(5), .enemy-col,
-    th:nth-child(7), .td-type { display: none; }
+    /* Table: status badges wrap naturally on mobile — no columns to hide */
     .td-name { font-size: 13px; max-width: none; }
+    .td-status { gap: 4px; }
     /* Detail row: single column on mobile */
     .row-detail-inner { grid-template-columns: 1fr; }
     .detail-col + .detail-col { padding: 12px 0 0 0; border-left: none; border-top: 1px solid var(--border); }
@@ -1395,46 +1423,52 @@
   <h1>Helldivers 2 — Major Orders — <span>Full Record</span></h1>
   <div class="header-sub">Second Galactic War · Feb 2024 — present · All outcomes logged</div>
   <div class="header-credit">Compiled by // <span>Papiplayero37</span></div>
-  <div class="header-meta">
-    <div class="meta-item filterable active" data-f="all">
-      <span class="meta-label">Total orders</span>
-      <span class="meta-val" id="stat-total">—</span>
+
+  <div class="header-dashboard">
+    <div class="header-live-col">
+      <div id="current-order-wrap"></div>
     </div>
-    <div class="meta-item filterable" data-f="win">
-      <span class="meta-label">Victories</span>
-      <span class="meta-val win" id="stat-win">—</span>
-    </div>
-    <div class="meta-item filterable" data-f="loss">
-      <span class="meta-label">Defeats</span>
-      <span class="meta-val loss" id="stat-loss">—</span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">Win rate</span>
-      <span class="meta-val rate" id="stat-rate">—</span>
+    <div class="header-stats-col">
+      <div class="header-meta">
+        <div class="meta-item filterable active" data-f="all">
+          <span class="meta-label">Total orders</span>
+          <span class="meta-val" id="stat-total">—</span>
+        </div>
+        <div class="meta-item filterable" data-f="win">
+          <span class="meta-label">Victories</span>
+          <span class="meta-val win" id="stat-win">—</span>
+        </div>
+        <div class="meta-item filterable" data-f="loss">
+          <span class="meta-label">Defeats</span>
+          <span class="meta-val loss" id="stat-loss">—</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Win rate</span>
+          <span class="meta-val rate" id="stat-rate">—</span>
+        </div>
+      </div>
+      <div class="type-stats-row" id="type-stats-row"></div>
     </div>
   </div>
-  <div class="type-stats-row" id="type-stats-row"></div>
 </header>
 
 <main>
-  <div id="current-order-wrap"></div>
 
-  <div class="controls">
+  <div class="controls" id="type-filter-controls">
     <span class="controls-label">Faction:</span>
     <button class="filter-btn active" data-f="all">All</button>
     <button class="filter-btn f-bug" data-f="Terminid">Terminids</button>
     <button class="filter-btn f-bot" data-f="Automaton">Automatons</button>
     <button class="filter-btn f-ill" data-f="Illuminate">Illuminate</button>
     <button class="filter-btn clear-btn hidden" id="clear-filter">× Clear</button>
-    <button class="filter-btn sort-btn" id="sort-toggle" style="margin-left:auto">Oldest first ↑</button>
-  </div>
-  <div class="controls" id="type-filter-controls">
+    <span class="controls-divider">|</span>
     <span class="controls-label">Type:</span>
     <button class="filter-btn active" data-t="all">All</button>
     <button class="filter-btn t-erad" data-t="3">Eradicate</button>
     <button class="filter-btn t-lib"  data-t="11">Liberate</button>
     <button class="filter-btn t-def"  data-t="12">Defend</button>
     <button class="filter-btn t-ctrl" data-t="13">Control</button>
+    <button class="filter-btn sort-btn" id="sort-toggle" style="margin-left:auto">Oldest first ↑</button>
   </div>
 
   <div class="table-wrap">
@@ -1445,9 +1479,9 @@
           <th>#</th>
           <th>Date</th>
           <th>Objective</th>
+          <th>Type</th>
           <th>Enemy</th>
           <th>Result</th>
-          <th>Type</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -2115,20 +2149,20 @@ function renderTable(filter) {
       <td class="td-num">${String(o.n).padStart(2,"0")}</td>
       <td class="td-date">${o.date}</td>
       <td class="td-name">${o.name}</td>
+      <td class="td-type">${typeCell}</td>
       <td class="enemy-col">${ENEMY_BADGE[o.enemy]}</td>
       <td class="result-col">${RESULT_BADGE[o.result]}</td>
-      <td class="td-type">${typeCell}</td>
     </tr>`
       + `<tr class="row-detail" data-n="${o.n}">
       <td colspan="7">
         <div class="row-detail-inner">
           <div class="detail-col">
-            <div class="detail-label">Outcome note</div>
-            <div class="detail-text">${noteHtml}${srcLink}</div>
-          </div>
-          <div class="detail-col">
             <div class="detail-label">In-game briefing</div>
             <div class="detail-text brief">${briefHtml}</div>
+          </div>
+          <div class="detail-col">
+            <div class="detail-label">Outcome note</div>
+            <div class="detail-text">${noteHtml}${srcLink}</div>
           </div>
         </div>
       </td>
