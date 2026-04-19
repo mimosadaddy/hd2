@@ -361,6 +361,20 @@
 
   th:first-child { padding-left: 0; }
 
+  .th-sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+  }
+  .th-sortable:hover { color: var(--text); }
+  .th-sortable.sorted { color: var(--accent); }
+  #sort-indicator {
+    font-size: 10px;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+  .th-sortable:hover #sort-indicator { opacity: 1; }
+
   tbody tr {
     border-bottom: 1px solid var(--border);
     transition: background 0.1s;
@@ -964,9 +978,8 @@
     .detail-col + .detail-col { padding: 12px 0 0 0; border-left: none; border-top: 1px solid var(--border); }
     .td-date { font-size: 10px; }
 
-    /* Controls: drop "Faction:" label; sort button gets its own full-width row */
+    /* Controls: drop "Faction:" label on mobile */
     .controls-label { display: none; }
-    .sort-btn { width: 100%; margin-left: 0 !important; justify-content: center; margin-top: 2px; }
 
     /* Toolbar: hide A−/A+ on mobile — default size is fine */
     .font-size-group { display: none; }
@@ -1502,7 +1515,6 @@
     <button class="filter-btn t-lib"  data-t="11">Liberate</button>
     <button class="filter-btn t-def"  data-t="12">Defend</button>
     <button class="filter-btn t-ctrl" data-t="13">Control</button>
-    <button class="filter-btn sort-btn" id="sort-toggle" style="margin-left:auto">Oldest first ↑</button>
   </div>
 
   <div class="table-wrap">
@@ -1511,7 +1523,7 @@
         <tr>
           <th></th>
           <th>#</th>
-          <th>Date</th>
+          <th id="th-date" class="th-sortable">Date <span id="sort-indicator">↓</span></th>
           <th>Objective</th>
           <th>Type</th>
           <th>Enemy</th>
@@ -2139,10 +2151,10 @@ let currentTypeFilter = "all";
 let sortNewest = localStorage.getItem('hd2-sort') !== 'oldest';
 
 function updateSortBtn() {
-  const btn = document.getElementById('sort-toggle');
-  btn.textContent = sortNewest ? 'Newest first ↓' : 'Oldest first ↑';
-  btn.style.borderColor = sortNewest ? 'var(--accent)' : '';
-  btn.style.color       = sortNewest ? 'var(--accent)' : '';
+  const th  = document.getElementById('th-date');
+  const ind = document.getElementById('sort-indicator');
+  if (ind) ind.textContent = sortNewest ? '↓' : '↑';
+  if (th)  th.classList.toggle('sorted', sortNewest);
 }
 
 function renderTable(filter) {
@@ -2293,9 +2305,9 @@ document.getElementById("type-stats-row").addEventListener("click", e => {
 // Clear button
 document.getElementById("clear-filter").addEventListener("click", () => setFilter("all"));
 
-// Sort toggle
+// Sort toggle — lives on the Date column header
 updateSortBtn();
-document.getElementById("sort-toggle").addEventListener("click", () => {
+document.getElementById("th-date").addEventListener("click", () => {
   sortNewest = !sortNewest;
   localStorage.setItem('hd2-sort', sortNewest ? 'newest' : 'oldest');
   updateSortBtn();
