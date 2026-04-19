@@ -180,6 +180,49 @@
   .meta-val.loss { color: var(--loss-text); }
   .meta-val.rate { color: var(--accent); }
 
+  /* Type breakdown row below main stat cards */
+  .type-stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .type-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    flex: 1;
+    min-width: 130px;
+  }
+  .type-stat-card:hover { border-color: var(--border-bright); background: var(--surface2); }
+  .type-stat-card.active { background: var(--surface2); }
+  .type-stat-nums {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-left: auto;
+    text-align: right;
+  }
+  .type-stat-count {
+    font-family: var(--font-cond);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text);
+  }
+  .type-stat-rate {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.07em;
+  }
+
   main {
     padding: 1.5rem 2rem 3rem;
   }
@@ -244,6 +287,13 @@
   .filter-btn.f-bug.active { border-color: var(--bug-text); color: var(--bug-text); background: rgba(122,79,30,0.2); }
   .filter-btn.f-bot.active { border-color: var(--bot-text); color: var(--bot-text); background: rgba(107,32,32,0.2); }
   .filter-btn.f-ill.active { border-color: var(--ill-text); color: var(--ill-text); background: rgba(61,42,107,0.2); }
+
+  /* Type filter active states — match type badge colours */
+  .filter-btn.t-erad.active { border-color: #d98080; color: #d98080; background: rgba(217,128,128,0.1); }
+  .filter-btn.t-lib.active  { border-color: #56a8e8; color: #56a8e8; background: rgba(86,168,232,0.1); }
+  .filter-btn.t-def.active  { border-color: #c8a84b; color: #c8a84b; background: rgba(200,168,75,0.1); }
+  .filter-btn.t-ctrl.active { border-color: #9a7ae0; color: #9a7ae0; background: rgba(154,122,224,0.1); }
+  .controls + .controls { margin-top: -10px; }
 
   .table-wrap {
     overflow-x: auto;
@@ -1011,14 +1061,14 @@
     flex-shrink: 0;
   }
   .tl-planet-mo {
-    grid-template-columns: 60px 100px 1fr auto;
+    grid-template-columns: 60px 100px 1fr auto auto;
     padding-left: 28px;
     background: #0d0e0f;
   }
   .tl-planet-mo:last-child { border-bottom: 1px solid var(--border-bright); }
   @media (max-width: 640px) {
     .tl-item { grid-template-columns: 50px 1fr auto; }
-    .tl-planet-mo { grid-template-columns: 50px 1fr auto; }
+    .tl-planet-mo { grid-template-columns: 50px 1fr auto auto; }
     .tl-date { display: none; }
   }
 
@@ -1270,6 +1320,7 @@
       <span class="meta-val rate" id="stat-rate">—</span>
     </div>
   </div>
+  <div class="type-stats-row" id="type-stats-row"></div>
 </header>
 
 <main>
@@ -1277,12 +1328,20 @@
 
   <div class="controls">
     <span class="controls-label">Faction:</span>
-    <button class="filter-btn" data-f="all">All</button>
+    <button class="filter-btn active" data-f="all">All</button>
     <button class="filter-btn f-bug" data-f="Terminid">Terminids</button>
     <button class="filter-btn f-bot" data-f="Automaton">Automatons</button>
     <button class="filter-btn f-ill" data-f="Illuminate">Illuminate</button>
     <button class="filter-btn clear-btn hidden" id="clear-filter">× Clear</button>
     <button class="filter-btn sort-btn" id="sort-toggle" style="margin-left:auto">Oldest first ↑</button>
+  </div>
+  <div class="controls" id="type-filter-controls">
+    <span class="controls-label">Type:</span>
+    <button class="filter-btn active" data-t="all">All</button>
+    <button class="filter-btn t-erad" data-t="3">Eradicate</button>
+    <button class="filter-btn t-lib"  data-t="11">Liberate</button>
+    <button class="filter-btn t-def"  data-t="12">Defend</button>
+    <button class="filter-btn t-ctrl" data-t="13">Control</button>
   </div>
 
   <div class="table-wrap">
@@ -1915,7 +1974,8 @@ const ENEMY_BADGE = {
   Multi:     '<span class="badge badge-multi">Multi-front</span>',
 };
 
-let currentFilter = "all";
+let currentFilter     = "all";
+let currentTypeFilter = "all";
 let sortNewest = localStorage.getItem('hd2-sort') !== 'oldest';
 
 function updateSortBtn() {
@@ -1931,6 +1991,11 @@ function renderTable(filter) {
   if (filter === "win")       rows = orders.filter(o => o.result === "win");
   else if (filter === "loss") rows = orders.filter(o => o.result !== "win");
   else if (["Terminid","Automaton","Illuminate"].includes(filter)) rows = orders.filter(o => o.enemy === filter);
+  // Apply type filter on top of faction/result filter
+  if (currentTypeFilter !== "all") {
+    const tc = parseInt(currentTypeFilter);
+    rows = rows.filter(o => (o.type ?? liveTypes[o.n]) === tc);
+  }
   if (sortNewest) rows = [...rows].reverse();
 
   let lastYear = null;
@@ -1984,8 +2049,8 @@ function setFilter(f) {
     }
   });
 
-  // Update faction buttons
-  document.querySelectorAll(".filter-btn:not(.clear-btn)").forEach(b => b.classList.remove("active"));
+  // Update faction buttons (leave type buttons untouched)
+  document.querySelectorAll(".filter-btn[data-f]:not(.clear-btn)").forEach(b => b.classList.remove("active"));
   const factionBtn = document.querySelector(`.filter-btn[data-f="${f}"]`);
   if (factionBtn) factionBtn.classList.add("active");
 
@@ -2007,11 +2072,42 @@ document.querySelectorAll(".meta-item.filterable").forEach(card => {
   });
 });
 
-// Faction buttons: toggle off if already active
-document.querySelectorAll(".filter-btn:not(.clear-btn)").forEach(btn => {
+// Faction buttons
+document.querySelectorAll(".filter-btn[data-f]:not(.clear-btn)").forEach(btn => {
   btn.addEventListener("click", () => {
     setFilter(btn.dataset.f === currentFilter ? "all" : btn.dataset.f);
   });
+});
+
+// Type filter buttons
+document.querySelectorAll(".filter-btn[data-t]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const t = btn.dataset.t;
+    currentTypeFilter = (t === currentTypeFilter) ? "all" : t;
+    document.querySelectorAll(".filter-btn[data-t]").forEach(b => b.classList.remove("active"));
+    const activeBtn = document.querySelector(`.filter-btn[data-t="${currentTypeFilter}"]`);
+    if (activeBtn) activeBtn.classList.add("active");
+    // Also sync type stat cards
+    document.querySelectorAll(".type-stat-card").forEach(c => {
+      c.classList.toggle("active", c.dataset.type === currentTypeFilter);
+    });
+    renderTable(currentFilter);
+  });
+});
+
+// Type stat cards (click to filter)
+document.getElementById("type-stats-row").addEventListener("click", e => {
+  const card = e.target.closest(".type-stat-card");
+  if (!card) return;
+  const t = card.dataset.type;
+  currentTypeFilter = (t === currentTypeFilter) ? "all" : t;
+  document.querySelectorAll(".filter-btn[data-t]").forEach(b => b.classList.remove("active"));
+  const activeBtn = document.querySelector(`.filter-btn[data-t="${currentTypeFilter}"]`);
+  if (activeBtn) activeBtn.classList.add("active");
+  document.querySelectorAll(".type-stat-card").forEach(c => {
+    c.classList.toggle("active", c.dataset.type === currentTypeFilter);
+  });
+  renderTable(currentFilter);
 });
 
 // Clear button
@@ -2026,7 +2122,35 @@ document.getElementById("sort-toggle").addEventListener("click", () => {
   renderTable(currentFilter);
 });
 
+// ── Type stat cards ──
+function renderTypeStats() {
+  const row = document.getElementById("type-stats-row");
+  if (!row) return;
+  const types = [
+    { code: 3,  label: "Eradicate", color: "#d98080" },
+    { code: 11, label: "Liberate",  color: "#56a8e8" },
+    { code: 12, label: "Defend",    color: "#c8a84b" },
+    { code: 13, label: "Control",   color: "#9a7ae0" },
+  ];
+  row.innerHTML = types.map(({ code, label, color }) => {
+    const subset   = orders.filter(o => (o.type ?? liveTypes[o.n]) === code);
+    const wins     = subset.filter(o => o.result === "win").length;
+    const aborted  = subset.filter(o => o.result === "partial").length;
+    const concluded= subset.filter(o => o.result !== "ongoing").length;
+    const rate     = concluded ? Math.round((wins + 0.5 * aborted) / concluded * 100) : null;
+    const rateStr  = rate !== null ? `${rate}% win rate` : "—";
+    return `<div class="type-stat-card" data-type="${code}" style="border-color:${color}22">
+      <span class="type-badge" style="color:${color};border-color:${color}">${label}</span>
+      <div class="type-stat-nums">
+        <span class="type-stat-count" style="color:${color}">${subset.length}</span>
+        <span class="type-stat-rate">${rateStr}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
 setFilter("all");
+renderTypeStats();
 
 // ── Font size controls ──
 let zoom = parseFloat(localStorage.getItem('hd2-zoom') || '1');
@@ -2358,10 +2482,16 @@ function renderTimeline(sortMode) {
       if (!o) return;
       const rc = TL_RES_COLOR[o.result] || '#888';
       const ri = TL_RES_ICON[o.result]  || '?';
+      const typeCode = o.type ?? liveTypes[o.n];
+      const typeInfo = typeCode != null ? (MO_TYPE_LABELS[typeCode] || { label:`Type ${typeCode}`, color:'#888' }) : null;
+      const typeBadge = typeInfo
+        ? `<span class="tl-badge" style="color:${typeInfo.color};border-color:${typeInfo.color}">${typeInfo.label}</span>`
+        : '';
       html += `<div class="tl-item tl-planet-mo">
         <span class="tl-n">#${String(n).padStart(3,'0')}</span>
         <span class="tl-date">${o.date}</span>
         <span class="tl-name">${o.name}</span>
+        ${typeBadge}
         <span class="tl-badge" style="color:${rc};border-color:${rc}">${ri} ${o.result?.toUpperCase()}</span>
       </div>`;
     });
