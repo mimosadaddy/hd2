@@ -143,6 +143,13 @@
     flex-direction: column;
   }
 
+  /* Propagate full height down to the card through the wrapper div */
+  #current-order-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
   /* Right column: two equal rows, both fill half the bento height */
   .header-stats-col {
     display: grid;
@@ -819,7 +826,7 @@
     margin-bottom: 0;
     position: relative;
     overflow: hidden;
-    height: 100%;
+    flex: 1;
     box-sizing: border-box;
   }
 
@@ -985,7 +992,8 @@
   @media (max-width: 900px) {
     .header-dashboard { grid-template-columns: 1fr; align-items: start; }
     .header-stats-col { grid-template-rows: auto auto; }
-    .current-order { height: auto; }
+    .current-order { flex: none; }
+    #current-order-wrap { flex: none; }
   }
 
   @media (max-width: 640px) {
