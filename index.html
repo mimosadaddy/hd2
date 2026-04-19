@@ -565,6 +565,17 @@
     padding-top: 8px;
     line-height: 1.5;
   }
+  .source-group-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--border);
+  }
+  .source-group-label:first-of-type { margin-top: 0; }
 
   /* ── About panel ── */
   .about-wrap {
@@ -1224,9 +1235,9 @@
       <hr class="about-divider">
 
       <div class="about-section">
-        <div class="about-section-heading">Primary Data Source</div>
-        <p>The order list is sourced from the <a href="https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0" target="_blank" rel="noopener">human-verified Google Sheet</a> maintained by Reddit user <strong style="color:var(--text)">u/Sad-Needleworker-590</strong>, who tracks every operation manually as the game progresses. This provides the canonical operation names, faction assignments, and outcomes.</p>
-        <p>Briefing text and exact dates are cross-referenced against the <a href="https://api.helldivers2.dev" target="_blank" rel="noopener">helldivers2.dev dispatch API</a>, which archives the in-game dispatch messages sent to players during each order.</p>
+        <div class="about-section-heading">Primary Data Sources</div>
+        <p><strong style="color:var(--text)">Order list —</strong> sourced from the <a href="https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0" target="_blank" rel="noopener">human-verified Google Sheet</a> maintained by Reddit user <strong style="color:var(--text)">u/Sad-Needleworker-590</strong>, who tracks every operation manually as the game progresses. This is the canonical source for operation names, faction assignments, and outcomes.</p>
+        <p><strong style="color:var(--text)">helldivers2.dev API —</strong> a community-run REST API at <a href="https://api.helldivers2.dev" target="_blank" rel="noopener">api.helldivers2.dev</a> (<a href="https://api.helldivers2.dev/docs" target="_blank" rel="noopener">docs</a>) that provides machine-readable game data. This dashboard uses it for three things: the <strong style="color:var(--text)">dispatch archive</strong> (in-game briefing messages, available from March 2024 onward), <strong style="color:var(--text)">planet data</strong> (positions, sector names, faction ownership for the galaxy map), and <strong style="color:var(--text)">live assignment data</strong> (current active order type and expiration).</p>
       </div>
 
       <hr class="about-divider">
@@ -1275,6 +1286,39 @@
       <hr class="about-divider">
 
       <div class="about-section">
+        <div class="about-section-heading">Human &amp; AI involvement</div>
+        <p>This project is a collaboration between human curation and AI-assisted development. Here is what each contributed:</p>
+        <table class="about-type-table">
+          <thead><tr><th>Layer</th><th>Who</th><th>What</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Game data</td>
+              <td><strong style="color:var(--text)">Human</strong></td>
+              <td>All 153 Major Orders, outcomes, and faction data are sourced from <a href="https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU" target="_blank" rel="noopener">u/Sad-Needleworker-590's spreadsheet</a> — manually tracked in real time by a community member</td>
+            </tr>
+            <tr>
+              <td>Live API data</td>
+              <td><strong style="color:var(--text)">Machine</strong></td>
+              <td>Briefing text, exact dates, planet positions, faction ownership, and current order type are fetched live from the community-run <a href="https://api.helldivers2.dev" target="_blank" rel="noopener">helldivers2.dev API</a></td>
+            </tr>
+            <tr>
+              <td>Order type tagging</td>
+              <td><strong style="color:var(--text)">AI-assisted</strong></td>
+              <td>148 of 153 orders were tagged with objective type (Eradicate / Liberate / Defend / Control) by running keyword analysis on briefing and note text using Claude. 5 orders predate the dispatch archive and remain untagged</td>
+            </tr>
+            <tr>
+              <td>Dashboard</td>
+              <td><strong style="color:var(--text)">AI-assisted</strong></td>
+              <td>The UI, filters, map, and all code were built with <a href="https://claude.ai/code" target="_blank" rel="noopener">Claude Code</a> (Anthropic). No frameworks, no build step — one HTML file</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top:8px;font-size:11px;color:var(--muted)">The underlying data is entirely human-sourced and community-maintained. AI was used to build the interface and assist with data processing — not to generate or invent any game facts.</p>
+      </div>
+
+      <hr class="about-divider">
+
+      <div class="about-section">
         <div class="about-section-heading">Built by</div>
         <p><a href="https://danilosierra.com" target="_blank" rel="noopener">danilosierra.com</a> — pure HTML/CSS/JS, no framework, no build step. Source on <a href="https://github.com/mimosadaddy/hd2" target="_blank" rel="noopener">GitHub</a>.</p>
       </div>
@@ -1285,14 +1329,23 @@
     <button class="toolbar-btn" id="sources-toggle">Sources ▾</button>
     <div class="sources-panel" id="sources-panel">
       <div class="sources-panel-title">Data Sources</div>
+
+      <div class="source-group-label">Primary — Order List</div>
+      <a href="https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0" target="_blank" rel="noopener">HD2 MO Log — u/Sad-Needleworker-590 ✦ human-verified</a>
+
+      <div class="source-group-label">Primary — Live API</div>
+      <a href="https://api.helldivers2.dev" target="_blank" rel="noopener">helldivers2.dev API</a>
+      <a href="https://api.helldivers2.dev/docs" target="_blank" rel="noopener">helldivers2.dev — API documentation</a>
+
+      <div class="source-group-label">Reference — Wiki &amp; Community</div>
       <a href="https://helldivers.wiki.gg/wiki/Major_Orders" target="_blank" rel="noopener">helldivers.wiki.gg — Major Orders</a>
       <a href="https://helldivers.wiki.gg/wiki/Major_Orders_of_2024" target="_blank" rel="noopener">helldivers.wiki.gg — Major Orders of 2024</a>
       <a href="https://helldivers.wiki.gg/wiki/Major_Orders_of_2025" target="_blank" rel="noopener">helldivers.wiki.gg — Major Orders of 2025</a>
       <a href="https://helldivers.fandom.com/wiki/Major_Orders" target="_blank" rel="noopener">helldivers.fandom.com — Major Orders</a>
       <a href="https://helldiverscompanion.com/#news" target="_blank" rel="noopener">helldiverscompanion.com — Dispatch Log</a>
       <a href="https://docs.google.com/document/d/1lvlNVU5aNPcUtPpxAsFS93P2xOJTAt-4HfKQH-IxRaA/edit?tab=t.0" target="_blank" rel="noopener">Community Galactic War Timeline (Herald/Cobfish)</a>
-      <a href="https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0" target="_blank" rel="noopener">HD2 Major Orders Log — u/Sad-Needleworker-590 (Google Sheets) ✦ human-verified</a>
-      <div class="source-note">Primary order list sourced from the human-verified Google Sheet by Reddit user Sad-Needleworker-590, cross-referenced against the helldivers2.dev dispatch API. Early Feb–Mar 2024 orders have limited dispatch documentation. Dates are approximate real-world dates, not in-universe dates.</div>
+
+      <div class="source-note">The community spreadsheet is the canonical record — every order is manually tracked and verified in real time by u/Sad-Needleworker-590. The helldivers2.dev API provides machine-readable data for live orders, planet positions, faction ownership, and an archive of in-game dispatch messages (available from dispatch ID 2797, March 13 2024 onward). Orders before that date have no dispatch archive.</div>
     </div>
   </div>
 </div>
