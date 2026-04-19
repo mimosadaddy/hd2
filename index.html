@@ -1440,7 +1440,12 @@
 
   <div class="header-dashboard">
     <div class="header-live-col">
-      <div id="current-order-wrap"></div>
+      <div id="current-order-wrap">
+        <div class="current-order co-standby">
+          <div class="co-header"><span class="co-label">Active Major Order</span></div>
+          <div class="co-text co-standby-text">ESTABLISHING COMMS…</div>
+        </div>
+      </div>
     </div>
     <div class="header-stats-col">
       <div class="header-meta">
@@ -2358,6 +2363,7 @@ function parseDispatch(msg) {
 
 async function loadCurrentOrder() {
   const wrap = document.getElementById('current-order-wrap');
+  if (!wrap) return;
   try {
     const headers = {
       'X-Super-Client': 'hd2-major-orders-dashboard',
@@ -2419,13 +2425,14 @@ async function loadCurrentOrder() {
     }, 60000);
 
   } catch (e) {
-    wrap.innerHTML = `
-      <div class="current-order co-standby">
-        <div class="co-header">
-          <span class="co-label">Active Major Order</span>
-        </div>
-        <div class="co-text co-standby-text">COMMS DISRUPTED — Could not reach High Command. Check back shortly.</div>
-      </div>`;
+    console.error('[HD2] loadCurrentOrder error:', e);
+    try {
+      wrap.innerHTML = `
+        <div class="current-order co-standby">
+          <div class="co-header"><span class="co-label">Active Major Order</span></div>
+          <div class="co-text co-standby-text">COMMS DISRUPTED — Could not reach High Command.</div>
+        </div>`;
+    } catch (_) {}
   }
 }
 
