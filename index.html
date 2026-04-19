@@ -328,7 +328,17 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
+    table-layout: fixed;
   }
+
+  /* Fixed column widths — prevents reflow when detail row opens */
+  thead th:nth-child(1) { width: 28px; }   /* expand */
+  thead th:nth-child(2) { width: 46px; }   /* # */
+  thead th:nth-child(3) { width: 130px; }  /* date */
+  thead th:nth-child(4) { }                /* objective — fills remaining space */
+  thead th:nth-child(5) { width: 110px; }  /* type */
+  thead th:nth-child(6) { width: 130px; }  /* enemy */
+  thead th:nth-child(7) { width: 106px; }  /* result */
 
   thead tr {
     border-bottom: 1px solid var(--border-bright);
@@ -417,7 +427,7 @@
   tr.data-row { cursor: pointer; }
   tr.data-row:hover .expand-icon { color: var(--muted); }
   tr.data-row.open .expand-icon { transform: rotate(90deg); color: var(--accent); }
-  tr.data-row.open { border-bottom: none; }
+  tr.data-row.open { border-bottom-color: transparent; }
 
   /* Expandable detail row */
   tr.row-detail { display: none; }
