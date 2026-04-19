@@ -67,7 +67,7 @@
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-body);
-    font-size: 20px;
+    font-size: 16px;
     line-height: 1.6;
     min-height: 100vh;
   }
@@ -377,20 +377,60 @@
     border: 1px solid;
     border-radius: 3px;
   }
-  .td-note {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.4;
-    min-width: 160px;
+  /* Row expand toggle */
+  .td-expand {
+    width: 28px;
+    padding: 0 4px 0 0;
+    vertical-align: middle;
+    text-align: center;
   }
+  .expand-icon {
+    font-size: 10px;
+    color: var(--dim);
+    transition: transform 0.2s, color 0.15s;
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px;
+  }
+  tr.data-row { cursor: pointer; }
+  tr.data-row:hover .expand-icon { color: var(--muted); }
+  tr.data-row.open .expand-icon { transform: rotate(90deg); color: var(--accent); }
 
-  .td-brief {
+  /* Expandable detail row */
+  tr.row-detail { display: none; }
+  tr.row-detail.open { display: table-row; }
+  tr.row-detail td {
+    padding: 0;
+    border-bottom: 1px solid var(--border-bright);
+  }
+  .row-detail-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: rgba(255,255,255,0.015);
+    padding: 14px 16px 16px 28px;
+  }
+  .detail-col { padding: 0 16px 0 0; }
+  .detail-col + .detail-col {
+    padding: 0 0 0 16px;
+    border-left: 1px solid var(--border);
+  }
+  .detail-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+  .detail-text {
     font-size: 12px;
     color: var(--muted);
-    line-height: 1.4;
-    font-style: italic;
-    min-width: 200px;
+    line-height: 1.55;
   }
+  .detail-text.brief { font-style: italic; }
+  .detail-empty { font-size: 11px; font-style: italic; opacity: 0.35; }
 
   .note-src {
     font-family: var(--font-mono);
@@ -402,7 +442,6 @@
     transition: color 0.12s;
     white-space: nowrap;
   }
-
   .note-src:hover { color: var(--accent); }
 
   .badge {
@@ -859,12 +898,13 @@
     .header-meta { grid-template-columns: repeat(2, 1fr); }
     .meta-val { font-size: 34px; }
 
-    /* Table: hide Enemy, Type, Notes, Briefing columns entirely (headers + cells) */
-    th:nth-child(4), .enemy-col,
-    th:nth-child(6), .td-type,
-    th:nth-child(7), .td-note,
-    th:nth-child(8), .td-brief { display: none; }
+    /* Table: hide Enemy + Type columns on mobile */
+    th:nth-child(5), .enemy-col,
+    th:nth-child(7), .td-type { display: none; }
     .td-name { font-size: 13px; max-width: none; }
+    /* Detail row: single column on mobile */
+    .row-detail-inner { grid-template-columns: 1fr; }
+    .detail-col + .detail-col { padding: 12px 0 0 0; border-left: none; border-top: 1px solid var(--border); }
     .td-date { font-size: 10px; }
 
     /* Controls: drop "Faction:" label; sort button gets its own full-width row */
@@ -1401,14 +1441,13 @@
     <table>
       <thead>
         <tr>
+          <th></th>
           <th>#</th>
           <th>Date</th>
           <th>Objective</th>
           <th>Enemy</th>
           <th>Result</th>
           <th>Type</th>
-          <th>Notes</th>
-          <th>Briefing</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -2057,22 +2096,42 @@ function renderTable(filter) {
     if (o.year !== lastYear) {
       lastYear = o.year;
       const label = o.year === 2024 ? "Year 2184 — 2024" : o.year === 2025 ? "Year 2185 — 2025" : "Year 2186 — 2026";
-      divider = `<tr class="divider-year"><td colspan="8" style="padding: 16px 0 6px; font-family:'Share Tech Mono',monospace; font-size:10px; color:#c8a84b; letter-spacing:0.2em; text-transform:uppercase; border-top: 1px solid rgba(255,255,255,0.07);">${label}</td></tr>`;
+      divider = `<tr class="divider-year"><td colspan="7" style="padding: 16px 0 6px; font-family:'Share Tech Mono',monospace; font-size:10px; color:#c8a84b; letter-spacing:0.2em; text-transform:uppercase; border-top: 1px solid rgba(255,255,255,0.07);">${label}</td></tr>`;
     }
-    return divider + `<tr data-result="${o.result}" data-enemy="${o.enemy}">
+    const typeCode = o.type ?? liveTypes[o.n];
+    const typeCell = typeCode == null
+      ? '<span style="font-style:italic;opacity:0.35;font-size:10px">—</span>'
+      : (() => { const t = MO_TYPE_LABELS[typeCode] || { label:`Type ${typeCode}`, color:'#888' }; return `<span class="type-badge" style="color:${t.color};border-color:${t.color}">${t.label}</span>`; })();
+
+    const noteHtml    = o.note    || '<span class="detail-empty">Outcome note not yet retrieved</span>';
+    const srcLink     = o.src     ? `<a class="note-src" href="${o.src}" target="_blank" rel="noopener">↗ src</a>` : '';
+    const briefHtml   = o.briefing != null ? o.briefing : '<span class="detail-empty">Briefing not yet retrieved — pre-API or unlogged dispatch</span>';
+    const hasDetail   = !!(o.note || o.briefing);
+    const expandIcon  = `<span class="expand-icon" title="Show notes &amp; briefing">▶</span>`;
+
+    return divider
+      + `<tr class="data-row" data-result="${o.result}" data-enemy="${o.enemy}" data-n="${o.n}">
+      <td class="td-expand">${expandIcon}</td>
       <td class="td-num">${String(o.n).padStart(2,"0")}</td>
       <td class="td-date">${o.date}</td>
       <td class="td-name">${o.name}</td>
       <td class="enemy-col">${ENEMY_BADGE[o.enemy]}</td>
       <td class="result-col">${RESULT_BADGE[o.result]}</td>
-      <td class="td-type">${(() => {
-        const code = o.type ?? liveTypes[o.n];
-        if (code == null) return '<span style="font-style:italic;opacity:0.35;font-size:10px">not yet tagged</span>';
-        const t = MO_TYPE_LABELS[code] || { label: `Type ${code}`, color: '#888' };
-        return `<span class="type-badge" style="color:${t.color};border-color:${t.color}">${t.label}</span>`;
-      })()}</td>
-      <td class="td-note">${o.note || '<span style="font-style:italic;opacity:0.45">Outcome note not yet retrieved</span>'}${o.src ? `<a class="note-src" href="${o.src}" target="_blank" rel="noopener">↗ src</a>` : ''}</td>
-      <td class="td-brief">${o.briefing ?? '<span style="font-style:italic;opacity:0.45">Briefing not yet retrieved — pre-API or unlogged dispatch</span>'}</td>
+      <td class="td-type">${typeCell}</td>
+    </tr>`
+      + `<tr class="row-detail" data-n="${o.n}">
+      <td colspan="7">
+        <div class="row-detail-inner">
+          <div class="detail-col">
+            <div class="detail-label">Outcome note</div>
+            <div class="detail-text">${noteHtml}${srcLink}</div>
+          </div>
+          <div class="detail-col">
+            <div class="detail-label">In-game briefing</div>
+            <div class="detail-text brief">${briefHtml}</div>
+          </div>
+        </div>
+      </td>
     </tr>`;
   }).join("");
 
@@ -2204,6 +2263,17 @@ function renderTypeStats() {
 
 setFilter("all");
 renderTypeStats();
+
+// ── Expandable row detail (event delegation on tbody) ──
+document.getElementById('tbody').addEventListener('click', e => {
+  const row = e.target.closest('tr.data-row');
+  if (!row) return;
+  const n = row.dataset.n;
+  const detail = document.querySelector(`tr.row-detail[data-n="${n}"]`);
+  if (!detail) return;
+  const isOpen = row.classList.toggle('open');
+  detail.classList.toggle('open', isOpen);
+});
 
 // ── Font size controls ──
 let zoom = parseFloat(localStorage.getItem('hd2-zoom') || '1');
