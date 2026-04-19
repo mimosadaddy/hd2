@@ -900,6 +900,20 @@
     margin-bottom: 0.35rem;
   }
 
+  .co-standby {
+    border-color: var(--border-bright) !important;
+    opacity: 0.65;
+  }
+
+  .co-standby-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.5rem 0 0.25rem;
+  }
+
   .co-error {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -2360,7 +2374,16 @@ async function loadCurrentOrder() {
       dispatchRes.ok ? dispatchRes.json() : Promise.resolve([])
     ]);
 
-    if (!assignments || !assignments.length) return;
+    if (!assignments || !assignments.length) {
+      wrap.innerHTML = `
+        <div class="current-order co-standby">
+          <div class="co-header">
+            <span class="co-label">Active Major Order</span>
+          </div>
+          <div class="co-text co-standby-text">STANDBY — No active Major Order at this time. Awaiting new orders from High Command.</div>
+        </div>`;
+      return;
+    }
 
     const order   = assignments[0];
     const medals  = order.reward?.amount ?? order.rewards?.[0]?.amount ?? null;
@@ -2396,7 +2419,13 @@ async function loadCurrentOrder() {
     }, 60000);
 
   } catch (e) {
-    // Fail silently — no active order or API unavailable
+    wrap.innerHTML = `
+      <div class="current-order co-standby">
+        <div class="co-header">
+          <span class="co-label">Active Major Order</span>
+        </div>
+        <div class="co-text co-standby-text">COMMS DISRUPTED — Could not reach High Command. Check back shortly.</div>
+      </div>`;
   }
 }
 
