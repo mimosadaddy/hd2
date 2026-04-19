@@ -313,6 +313,20 @@
     line-height: 1.3;
   }
 
+  .td-type {
+    white-space: nowrap;
+    min-width: 90px;
+  }
+  .type-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border: 1px solid;
+    border-radius: 3px;
+  }
   .td-note {
     font-size: 12px;
     color: var(--muted);
@@ -575,6 +589,35 @@
     border-top: 1px solid var(--border);
     margin: 10px 0 14px;
   }
+  .about-type-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 12px;
+  }
+  .about-type-table th {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 4px 10px;
+    border-bottom: 1px solid var(--border-bright);
+  }
+  .about-type-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: middle;
+  }
+  .about-type-table tr:last-child td { border-bottom: none; }
+  .about-type-table td:first-child code {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    opacity: 0.7;
+  }
 
   /* ── Attribution ── */
   .header-credit {
@@ -755,10 +798,11 @@
     .header-meta { grid-template-columns: repeat(2, 1fr); }
     .meta-val { font-size: 34px; }
 
-    /* Table: hide Enemy, Notes, Briefing columns entirely (headers + cells) */
+    /* Table: hide Enemy, Type, Notes, Briefing columns entirely (headers + cells) */
     th:nth-child(4), .enemy-col,
-    th:nth-child(6), .td-note,
-    th:nth-child(7), .td-brief { display: none; }
+    th:nth-child(6), .td-type,
+    th:nth-child(7), .td-note,
+    th:nth-child(8), .td-brief { display: none; }
     .td-name { font-size: 13px; max-width: none; }
     .td-date { font-size: 10px; }
 
@@ -1163,6 +1207,24 @@
       <hr class="about-divider">
 
       <div class="about-section">
+        <div class="about-section-heading">Order Types</div>
+        <p>Each Major Order has an objective type defined by the game's API. The <strong style="color:var(--text)">Type</strong> column in the table uses these values, sourced from the <code style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">/api/v1/assignments</code> endpoint for the current active order. Historical orders are being tagged retroactively.</p>
+        <table class="about-type-table">
+          <thead><tr><th>Code</th><th>Label</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>3</code></td><td><span class="type-badge" style="color:#d98080;border-color:#d98080">Eradicate</span></td><td>Kill a target number of enemies</td></tr>
+            <tr><td><code>11</code></td><td><span class="type-badge" style="color:#56a8e8;border-color:#56a8e8">Liberate</span></td><td>Liberate a set of planets from enemy control</td></tr>
+            <tr><td><code>12</code></td><td><span class="type-badge" style="color:#c8a84b;border-color:#c8a84b">Defend</span></td><td>Defend planets from active enemy invasion</td></tr>
+            <tr><td><code>13</code></td><td><span class="type-badge" style="color:#9a7ae0;border-color:#9a7ae0">Control</span></td><td>Hold or maintain control of target planets</td></tr>
+            <tr><td><code>—</code></td><td><span style="font-style:italic;opacity:0.45;font-size:11px">not yet tagged</span></td><td>Historical order — type being added retroactively</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:8px;font-size:11px;color:var(--muted)">Additional types (sample collection, terminal activation, etc.) may appear as new order formats are encountered and will be added here.</p>
+      </div>
+
+      <hr class="about-divider">
+
+      <div class="about-section">
         <div class="about-section-heading">Built by</div>
         <p><a href="https://danilosierra.com" target="_blank" rel="noopener">danilosierra.com</a> — pure HTML/CSS/JS, no framework, no build step. Source on <a href="https://github.com/mimosadaddy/hd2" target="_blank" rel="noopener">GitHub</a>.</p>
       </div>
@@ -1232,6 +1294,7 @@
           <th>Objective</th>
           <th>Enemy</th>
           <th>Result</th>
+          <th>Type</th>
           <th>Notes</th>
           <th>Briefing</th>
         </tr>
@@ -1800,6 +1863,45 @@ Defend the Ursa sector from Terminid attacks and exterminate the Rupture and Pre
   { n:153, year:2026, date:`Apr 15, 2026`, name:`Operation Void Attack`, enemy:`Illuminate`, result:`ongoing`, note:``, src:`https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU/edit?gid=0#gid=0`, briefing:`The Illuminate have launched unprovoked raids against our most valued territories. Appropriator squads are attempting unauthorized relocation of human assets. The Helldivers are ordered to repel the Illuminate assault.` },
 ];
 
+// ── Order type vocabulary (from helldivers2.dev /api/v1/assignments) ──
+const MO_TYPE_LABELS = {
+  3:  { label: 'Eradicate', color: '#d98080' },
+  11: { label: 'Liberate',  color: '#56a8e8' },
+  12: { label: 'Defend',    color: '#c8a84b' },
+  13: { label: 'Control',   color: '#9a7ae0' },
+};
+
+// Runtime map populated by live API fetch: { orderN: typeCode }
+const liveTypes = {};
+
+// Fetch current assignment type from live API and map to most-recent order
+(async () => {
+  try {
+    const res = await fetch('https://api.helldivers2.dev/api/v1/assignments', {
+      headers: { 'X-Super-Client':'hd2-major-orders-dashboard', 'X-Super-Contact':'dxnilosierra' }
+    });
+    const assignments = await res.json();
+    if (!Array.isArray(assignments)) return;
+    assignments.forEach(a => {
+      if (!a.type) return;
+      // Match to our orders by briefing text overlap, falling back to most-recent
+      const briefSnippet = (a.briefing || a.description || '').toLowerCase().slice(0, 80);
+      let matched = null;
+      if (briefSnippet) {
+        matched = orders.find(o => o.briefing && o.briefing.toLowerCase().includes(briefSnippet.slice(0, 40)));
+      }
+      if (!matched) {
+        // Fall back to highest-numbered order without a type already set
+        matched = [...orders].reverse().find(o => !o.type && !liveTypes[o.n]);
+      }
+      if (matched) {
+        liveTypes[matched.n] = a.type;
+        renderTable(); // re-render once we have live type
+      }
+    });
+  } catch(e) { /* silent — live type is best-effort */ }
+})();
+
 const RESULT_BADGE = {
   win:     '<span class="badge badge-win">Victory</span>',
   loss:    '<span class="badge badge-loss">Defeat</span>',
@@ -1837,7 +1939,7 @@ function renderTable(filter) {
     if (o.year !== lastYear) {
       lastYear = o.year;
       const label = o.year === 2024 ? "Year 2184 — 2024" : o.year === 2025 ? "Year 2185 — 2025" : "Year 2186 — 2026";
-      divider = `<tr class="divider-year"><td colspan="7" style="padding: 16px 0 6px; font-family:'Share Tech Mono',monospace; font-size:10px; color:#c8a84b; letter-spacing:0.2em; text-transform:uppercase; border-top: 1px solid rgba(255,255,255,0.07);">${label}</td></tr>`;
+      divider = `<tr class="divider-year"><td colspan="8" style="padding: 16px 0 6px; font-family:'Share Tech Mono',monospace; font-size:10px; color:#c8a84b; letter-spacing:0.2em; text-transform:uppercase; border-top: 1px solid rgba(255,255,255,0.07);">${label}</td></tr>`;
     }
     return divider + `<tr data-result="${o.result}" data-enemy="${o.enemy}">
       <td class="td-num">${String(o.n).padStart(2,"0")}</td>
@@ -1845,6 +1947,12 @@ function renderTable(filter) {
       <td class="td-name">${o.name}</td>
       <td class="enemy-col">${ENEMY_BADGE[o.enemy]}</td>
       <td class="result-col">${RESULT_BADGE[o.result]}</td>
+      <td class="td-type">${(() => {
+        const code = o.type ?? liveTypes[o.n];
+        if (code == null) return '<span style="font-style:italic;opacity:0.35;font-size:10px">not yet tagged</span>';
+        const t = MO_TYPE_LABELS[code] || { label: `Type ${code}`, color: '#888' };
+        return `<span class="type-badge" style="color:${t.color};border-color:${t.color}">${t.label}</span>`;
+      })()}</td>
       <td class="td-note">${o.note || '<span style="font-style:italic;opacity:0.45">Outcome note not yet retrieved</span>'}${o.src ? `<a class="note-src" href="${o.src}" target="_blank" rel="noopener">↗ src</a>` : ''}</td>
       <td class="td-brief">${o.briefing ?? '<span style="font-style:italic;opacity:0.45">Briefing not yet retrieved — pre-API or unlogged dispatch</span>'}</td>
     </tr>`;
