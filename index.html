@@ -1267,6 +1267,17 @@
   }
 
   /* ── Map legibility improvements ── */
+  .map-sector-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    fill: rgba(255,255,255,0.13);
+    text-anchor: middle;
+    dominant-baseline: middle;
+    letter-spacing: 0.12em;
+    pointer-events: none;
+    user-select: none;
+  }
+
   .map-name {
     font-size: 11px;
     paint-order: stroke fill;
@@ -2617,10 +2628,10 @@ async function loadGalaxyMap() {
     const moResult = {}, moName = {};
     orders.forEach(o => { moResult[o.n] = o.result; moName[o.n] = o.name; });
 
-    // Coordinate transform
+    // Coordinate transform — use ALL planets for bounds so bg dots don't clip
     const W = 960, H = 860, PAD = 80;
-    const xs = planets.map(p => p.position.x);
-    const ys = planets.map(p => p.position.y);
+    const xs = allPlanets.map(p => p.position.x);
+    const ys = allPlanets.map(p => p.position.y);
     const xMin = Math.min(...xs), xMax = Math.max(...xs);
     const yMin = Math.min(...ys), yMax = Math.max(...ys);
     const scale = Math.min((W - PAD*2)/(xMax-xMin), (H - PAD*2)/(yMax-yMin));
@@ -2629,10 +2640,38 @@ async function loadGalaxyMap() {
     const tx = x => offX + (x-xMin)*scale;
     const ty = y => H - offY - (y-yMin)*scale; // flip Y
 
+    // posMap for ALL planets (bg dots + MO nodes share the same coordinate space)
     const posMap = {};
-    planets.forEach(p => { posMap[p.index] = { x: tx(p.position.x), y: ty(p.position.y) }; });
+    allPlanets.forEach(p => { posMap[p.index] = { x: tx(p.position.x), y: ty(p.position.y) }; });
 
     const FC = { Humans:'#8ecf94', Terminids:'#e8a056', Automaton:'#e85555', Illuminate:'#9a7ae0' };
+
+    // ── Background dots (all non-MO planets, tiny + semi-transparent) ──
+    let bgSVG = '';
+    allPlanets.forEach(p => {
+      if (MO_PLANET_IDS.has(p.index)) return;
+      const pos = posMap[p.index];
+      if (!pos) return;
+      const col = FC[p.currentOwner] || '#ffffff';
+      bgSVG += `<circle cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="2.5" fill="${col}" fill-opacity="0.18"/>`;
+    });
+
+    // ── Sector labels (centroid of each sector group) ──
+    const sectorGroups = {};
+    allPlanets.forEach(p => {
+      const s = (p.sector || '').replace(/ Sector$/i, '').trim();
+      if (!s) return;
+      if (!sectorGroups[s]) sectorGroups[s] = { xs: [], ys: [] };
+      sectorGroups[s].xs.push(tx(p.position.x));
+      sectorGroups[s].ys.push(ty(p.position.y));
+    });
+    let sectorSVG = '';
+    Object.entries(sectorGroups).forEach(([name, d]) => {
+      if (d.xs.length < 3) return; // skip tiny sectors
+      const cx = d.xs.reduce((a,b)=>a+b,0) / d.xs.length;
+      const cy = d.ys.reduce((a,b)=>a+b,0) / d.ys.length;
+      sectorSVG += `<text x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" class="map-sector-label">${name.toUpperCase()}</text>`;
+    });
 
     // ── Edges ──
     let edgesSVG = '';
@@ -2687,7 +2726,7 @@ async function loadGalaxyMap() {
 </g>`;
     });
 
-    svg.innerHTML = edgesSVG + nodesSVG;
+    svg.innerHTML = bgSVG + sectorSVG + edgesSVG + nodesSVG;
 
     // ── Tooltip ──
     const tt = document.getElementById('map-tooltip');
