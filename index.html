@@ -129,13 +129,13 @@
     letter-spacing: 0.05em;
   }
 
-  /* ── Two-column header layout ── */
+  /* ── Bento-box header layout ── */
   .header-dashboard {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
-    gap: 20px;
+    gap: 10px;
     margin-top: 1.75rem;
-    align-items: start;
+    align-items: stretch;   /* both columns same height */
   }
 
   .header-live-col {
@@ -143,17 +143,20 @@
     flex-direction: column;
   }
 
+  /* Right column: two equal rows that fill the available height */
   .header-stats-col {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
     gap: 10px;
   }
 
+  /* Top row: 4 stat tiles, equal width, stretch to row height */
   .header-meta {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: 10px;
     margin-top: 0;
+    align-items: stretch;
   }
 
   .meta-item {
@@ -165,6 +168,7 @@
     flex-direction: column;
     gap: 8px;
     transition: border-color 0.15s, background 0.15s;
+    align-self: stretch;
   }
 
   .meta-item.filterable {
@@ -200,12 +204,13 @@
   .meta-val.loss { color: var(--loss-text); }
   .meta-val.rate { color: var(--accent); }
 
-  /* Type breakdown row below main stat cards */
+  /* Bottom row: 4 type tiles, same grid as stat row above */
   .type-stats-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 0;
+    align-items: stretch;
   }
   .type-stat-card {
     display: flex;
@@ -217,8 +222,6 @@
     padding: 8px 14px;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
-    flex: 1;
-    min-width: 130px;
   }
   .type-stat-card:hover { border-color: var(--border-bright); background: var(--surface2); }
   .type-stat-card.active { background: var(--surface2); }
@@ -939,7 +942,8 @@
   .enemy-col  { white-space: nowrap; }
 
   @media (max-width: 900px) {
-    .header-dashboard { grid-template-columns: 1fr; }
+    .header-dashboard { grid-template-columns: 1fr; align-items: start; }
+    .header-stats-col { grid-template-rows: auto auto; }
     .current-order { height: auto; }
   }
 
