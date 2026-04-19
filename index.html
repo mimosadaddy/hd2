@@ -796,6 +796,41 @@
     vertical-align: middle;
   }
   .about-type-table tr:last-child td { border-bottom: none; }
+
+  /* Human & AI involvement list */
+  .involvement-list { display: flex; flex-direction: column; margin-top: 12px; }
+  .inv-row {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .inv-row:first-child { border-top: 1px solid var(--border); }
+  .inv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .inv-layer {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--dim);
+  }
+  .inv-who {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text);
+  }
+  .inv-who.ai { color: var(--accent); }
+  .inv-what {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
   .about-type-table td:first-child code {
     font-family: var(--font-mono);
     font-size: 10px;
@@ -1433,31 +1468,36 @@
       <div class="about-section">
         <div class="about-section-heading">Human &amp; AI involvement</div>
         <p>This project is a collaboration between human curation and AI-assisted development. Here is what each contributed:</p>
-        <table class="about-type-table">
-          <thead><tr><th>Layer</th><th>Who</th><th>What</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>Game data</td>
-              <td><strong style="color:var(--text)">Human</strong></td>
-              <td>All 153 Major Orders, outcomes, and faction data are sourced from <a href="https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU" target="_blank" rel="noopener">u/Sad-Needleworker-590's spreadsheet</a> — manually tracked in real time by a community member</td>
-            </tr>
-            <tr>
-              <td>Live API data</td>
-              <td><strong style="color:var(--text)">Machine</strong></td>
-              <td>Briefing text, exact dates, planet positions, faction ownership, and current order type are fetched live from the community-run <a href="https://api.helldivers2.dev" target="_blank" rel="noopener">helldivers2.dev API</a></td>
-            </tr>
-            <tr>
-              <td>Order type tagging</td>
-              <td><strong style="color:var(--text)">AI-assisted</strong></td>
-              <td>148 of 153 orders were tagged with objective type (Eradicate / Liberate / Defend / Control) by running keyword analysis on briefing and note text using Claude. 5 orders predate the dispatch archive and remain untagged</td>
-            </tr>
-            <tr>
-              <td>Dashboard</td>
-              <td><strong style="color:var(--text)">AI-assisted</strong></td>
-              <td>The UI, filters, map, and all code were built with <a href="https://claude.ai/code" target="_blank" rel="noopener">Claude Code</a> (Anthropic). No frameworks, no build step — one HTML file</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="involvement-list">
+          <div class="inv-row">
+            <div class="inv-header">
+              <span class="inv-layer">Game data</span>
+              <span class="inv-who">Human</span>
+            </div>
+            <div class="inv-what">All 153 Major Orders, outcomes, and faction data are sourced from <a href="https://docs.google.com/spreadsheets/d/12ji8TsaKG1u3zoicuQ7qSSm10XNrBZf9V4gR84GZNuU" target="_blank" rel="noopener">u/Sad-Needleworker-590's spreadsheet</a> — manually tracked in real time by a community member.</div>
+          </div>
+          <div class="inv-row">
+            <div class="inv-header">
+              <span class="inv-layer">Live API data</span>
+              <span class="inv-who">Machine</span>
+            </div>
+            <div class="inv-what">Briefing text, exact dates, planet positions, faction ownership, and current order type are fetched live from the community-run <a href="https://api.helldivers2.dev" target="_blank" rel="noopener">helldivers2.dev API</a>.</div>
+          </div>
+          <div class="inv-row">
+            <div class="inv-header">
+              <span class="inv-layer">Order type tagging</span>
+              <span class="inv-who ai">AI-assisted</span>
+            </div>
+            <div class="inv-what">148 of 153 orders were tagged with objective type (Eradicate / Liberate / Defend / Control) by running keyword analysis on briefing and note text using Claude. 5 orders predate the dispatch archive and remain untagged.</div>
+          </div>
+          <div class="inv-row">
+            <div class="inv-header">
+              <span class="inv-layer">Dashboard</span>
+              <span class="inv-who ai">AI-assisted</span>
+            </div>
+            <div class="inv-what">The UI, filters, map, and all code were built with <a href="https://claude.ai/code" target="_blank" rel="noopener">Claude Code</a> (Anthropic). No frameworks, no build step — one HTML file.</div>
+          </div>
+        </div>
         <p style="margin-top:8px;font-size:11px;color:var(--muted)">The underlying data is entirely human-sourced and community-maintained. AI was used to build the interface and assist with data processing — not to generate or invent any game facts.</p>
       </div>
 
