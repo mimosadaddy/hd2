@@ -143,7 +143,7 @@
     flex-direction: column;
   }
 
-  /* Right column: two equal rows that fill the available height */
+  /* Right column: two equal rows, both fill half the bento height */
   .header-stats-col {
     display: grid;
     grid-template-rows: 1fr 1fr;
@@ -180,7 +180,7 @@
     background: var(--surface2);
   }
 
-  .meta-item.filterable.active          { border-color: var(--accent);    background: var(--accent-dim); }
+  .meta-item.filterable.active          { border-color: var(--border-bright); background: rgba(255,255,255,0.04); }
   .meta-item.filterable.active-win      { border-color: var(--win-text);  background: var(--win-bg); }
   .meta-item.filterable.active-loss     { border-color: var(--loss-text); background: var(--loss-bg); }
 
@@ -204,46 +204,72 @@
   .meta-val.loss { color: var(--loss-text); }
   .meta-val.rate { color: var(--accent); }
 
-  /* Bottom row: 4 type tiles, same grid as stat row above */
+  /* ── Type breakdown strip ── */
   .type-stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-top: 0;
-    align-items: stretch;
-  }
-  .type-stat-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 8px 14px;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-  }
-  .type-stat-card:hover { border-color: var(--border-bright); background: var(--surface2); }
-  .type-stat-card.active { background: var(--surface2); }
-  .type-stat-nums {
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    margin-left: auto;
-    text-align: right;
+    justify-content: space-around;
   }
-  .type-stat-count {
+
+  .type-strip-row {
+    display: grid;
+    grid-template-columns: 76px 36px 1fr 40px 72px;
+    gap: 10px;
+    align-items: center;
+    padding: 4px 4px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .type-strip-row:hover  { background: rgba(255,255,255,0.04); }
+  .type-strip-row.active { background: rgba(255,255,255,0.06); }
+  .type-strip-row.active .ts-label { opacity: 1; }
+
+  .ts-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    transition: opacity 0.15s;
+  }
+  .ts-count {
     font-family: var(--font-cond);
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    line-height: 1;
     color: var(--text);
+    text-align: right;
+    line-height: 1;
   }
-  .type-stat-rate {
+  .ts-bar-wrap {
+    height: 2px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .ts-bar {
+    height: 100%;
+    border-radius: 1px;
+    opacity: 0.45;
+    transition: width 0.5s ease;
+  }
+  .ts-pct {
     font-family: var(--font-mono);
     font-size: 9px;
     color: var(--muted);
-    letter-spacing: 0.07em;
+    text-align: right;
+    letter-spacing: 0.05em;
+  }
+  .ts-wl {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--dim);
+    text-align: right;
+    letter-spacing: 0.03em;
   }
 
   main {
@@ -284,8 +310,9 @@
   .filter-btn:hover { border-color: var(--border-bright); color: var(--text); }
 
   .filter-btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--border-bright);
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
     background: var(--accent-dim);
   }
 
@@ -584,7 +611,7 @@
     align-items: center;
   }
 
-  .toolbar-btn:hover { border-color: var(--accent); color: var(--text); }
+  .toolbar-btn:hover { border-color: var(--border-bright); color: var(--text); }
 
   .font-size-group {
     display: flex;
@@ -2279,25 +2306,25 @@ document.querySelectorAll(".filter-btn[data-t]").forEach(btn => {
     document.querySelectorAll(".filter-btn[data-t]").forEach(b => b.classList.remove("active"));
     const activeBtn = document.querySelector(`.filter-btn[data-t="${currentTypeFilter}"]`);
     if (activeBtn) activeBtn.classList.add("active");
-    // Also sync type stat cards
-    document.querySelectorAll(".type-stat-card").forEach(c => {
-      c.classList.toggle("active", c.dataset.type === currentTypeFilter);
+    // Also sync type strip rows
+    document.querySelectorAll(".type-strip-row").forEach(r => {
+      r.classList.toggle("active", r.dataset.type === currentTypeFilter);
     });
     renderTable(currentFilter);
   });
 });
 
-// Type stat cards (click to filter)
+// Type strip rows (click to filter)
 document.getElementById("type-stats-row").addEventListener("click", e => {
-  const card = e.target.closest(".type-stat-card");
-  if (!card) return;
-  const t = card.dataset.type;
+  const row = e.target.closest(".type-strip-row");
+  if (!row) return;
+  const t = row.dataset.type;
   currentTypeFilter = (t === currentTypeFilter) ? "all" : t;
   document.querySelectorAll(".filter-btn[data-t]").forEach(b => b.classList.remove("active"));
   const activeBtn = document.querySelector(`.filter-btn[data-t="${currentTypeFilter}"]`);
   if (activeBtn) activeBtn.classList.add("active");
-  document.querySelectorAll(".type-stat-card").forEach(c => {
-    c.classList.toggle("active", c.dataset.type === currentTypeFilter);
+  document.querySelectorAll(".type-strip-row").forEach(r => {
+    r.classList.toggle("active", r.dataset.type === currentTypeFilter);
   });
   renderTable(currentFilter);
 });
@@ -2327,16 +2354,16 @@ function renderTypeStats() {
   row.innerHTML = types.map(({ code, label, color }) => {
     const subset   = orders.filter(o => (o.type ?? liveTypes[o.n]) === code);
     const wins     = subset.filter(o => o.result === "win").length;
+    const losses   = subset.filter(o => o.result === "loss").length;
     const aborted  = subset.filter(o => o.result === "partial").length;
     const concluded= subset.filter(o => o.result !== "ongoing").length;
     const rate     = concluded ? Math.round((wins + 0.5 * aborted) / concluded * 100) : null;
-    const rateStr  = rate !== null ? `${rate}% win rate` : "—";
-    return `<div class="type-stat-card" data-type="${code}" style="border-color:${color}22">
-      <span class="type-badge" style="color:${color};border-color:${color}">${label}</span>
-      <div class="type-stat-nums">
-        <span class="type-stat-count" style="color:${color}">${subset.length}</span>
-        <span class="type-stat-rate">${rateStr}</span>
-      </div>
+    return `<div class="type-strip-row" data-type="${code}">
+      <span class="ts-label" style="color:${color}">${label}</span>
+      <span class="ts-count">${subset.length}</span>
+      <div class="ts-bar-wrap"><div class="ts-bar" style="width:${rate ?? 0}%;background:${color}"></div></div>
+      <span class="ts-pct">${rate !== null ? rate + '%' : '—'}</span>
+      <span class="ts-wl">${wins}W · ${losses}L</span>
     </div>`;
   }).join("");
 }
