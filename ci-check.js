@@ -123,14 +123,15 @@ async function main() {
     `src:"https://helldivers.wiki.gg/wiki/Major_Orders_of_${year}" },`;
 
   // Insert before the closing ]; of the orders array
-  if (!html.includes('];\n\nconst RESULT_BADGE')) {
+  const MARKER = '];\n\n// ── Order type vocabulary';
+  if (!html.includes(MARKER)) {
     console.error('Could not find insertion point in index.html');
     process.exit(1);
   }
 
   const updated = html.replace(
-    '];\n\nconst RESULT_BADGE',
-    `\n${newEntry}\n];\n\nconst RESULT_BADGE`
+    MARKER,
+    `\n${newEntry}\n${MARKER}`
   );
 
   fs.writeFileSync(INDEX_FILE, updated);
