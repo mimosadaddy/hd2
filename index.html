@@ -1828,7 +1828,7 @@
   <div id="map-view">
       <div id="galaxy-map-wrap">
         <div class="map-loading" id="map-loading">Loading galaxy map…</div>
-        <svg id="galaxy-map" viewBox="52 95 1270 1300" xmlns="http://www.w3.org/2000/svg"></svg>
+        <svg id="galaxy-map" viewBox="35 93 1304 1304" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
         <div id="map-tooltip"></div>
         <div class="map-legend">
           <div class="map-legend-item"><div class="map-legend-dot" style="background:#deca80"></div>Super Earth</div>
@@ -2817,6 +2817,16 @@ async function loadGalaxyMap() {
     // posMap for ALL planets (bg dots + MO nodes share the same coordinate space)
     const posMap = {};
     allPlanets.forEach(p => { posMap[p.index] = { x: tx(p.position.x), y: ty(p.position.y) }; });
+
+    // ── Center viewBox exactly on Super Earth (index 0) ──
+    // Use a square viewBox so xMidYMid meet always puts SE at visual center
+    // regardless of container aspect ratio. R=652 comfortably fits the full galaxy.
+    const sePos = posMap[0];
+    if (sePos) {
+      const R = 652;
+      svg.setAttribute('viewBox', `${Math.round(sePos.x - R)} ${Math.round(sePos.y - R)} ${R*2} ${R*2}`);
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    }
 
     const FC = { Humans:'#6a9a6a', Terminids:'#d4924a', Automaton:'#5a9fd4', Illuminate:'#8a6ad0' };
 
